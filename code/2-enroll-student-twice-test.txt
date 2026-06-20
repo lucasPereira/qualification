@@ -1,0 +1,14 @@
+@Test
+fun `não deve matricular o estudante duas vezes`() {
+  val ufsc = Universidade("UFSC")
+  val alice = ufsc.admitir("Alice")
+  val bob = ufsc.contratar("Bob")
+  val cc = ufsc.criarPrograma("Ciência da Computação")
+  val algoritmos = cc.criarDisciplina("Algoritmos", bob)
+  algoritmos.matricular(alice)
+
+  val sucesso = algoritmos.matricular(alice)
+
+  assertFalse(sucesso)
+  assertEquals(listOf(alice), algoritmos.estudantes)
+}

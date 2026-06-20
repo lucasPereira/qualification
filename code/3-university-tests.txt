@@ -1,0 +1,30 @@
+class TesteUniversidade {
+  private lateinit var algoritmos: Disciplina
+  private lateinit var alice: Estudante
+
+  @BeforeEach
+  fun configurar() {
+    val ufsc = Universidade("UFSC")
+    alice = ufsc.admitir("Alice")
+    val bob = ufsc.contratar("Bob")
+    val cc = ufsc.criarPrograma("Ciência da Computação")
+    algoritmos = cc.criarDisciplina("Algoritmos", bob)
+    algoritmos.matricular(alice)
+  }
+
+  @Test
+  fun `deve cancelar a matrícula do estudante`() {
+    val sucesso = algoritmos.cancelarMatricula(alice)
+
+    assertTrue(sucesso)
+    assertTrue(algoritmos.estudantes.isEmpty())
+  }
+
+  @Test
+  fun `não deve matricular o estudante duas vezes`() {
+    val sucesso = algoritmos.matricular(alice)
+
+    assertFalse(sucesso)
+    assertEquals(listOf(alice), algoritmos.estudantes)
+  }
+}
