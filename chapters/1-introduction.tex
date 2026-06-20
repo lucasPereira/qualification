@@ -43,3 +43,19 @@ Entretanto, nem sempre é simples decidir como os testes devem ser organizados. 
 \end{figure}
 
 O problema fica evidente mesmo com um exemplo simples: organizar os métodos de teste levando em conta a redução da duplicação de código não é uma tarefa trivial. Em especial, em projetos com centenas ou milhares de testes, a distribuição de um novo teste leva a uma explosão combinatória de possibilidades. Convém destacar que não é apenas uma decisão sobre qual é a melhor classe de teste para inserir o novo teste, mas também sobre como re-distribuir os testes já existentes entre as classes de teste da maneira mais eficiente. Quando um novo teste é introduzido, por exemplo, é possível que a nova distribuição ótima acabe separando testes que antes pertenciam à mesma classe de teste. Percebe-se, então, que com o objetivo de atingir uma distribuição ótima dos testes considerando a redução da duplicação de código, é necessário que o código de teste seja continuamente refatorado e reorganizado.
+
+\section{Problema de pesquisa}
+
+Diante desse contexto, o problema de pesquisa é enunciado da seguinte maneira: como reduzir a duplicação de código de teste sem aumentar o esforço total de desenvolvimento e manutenção e sem alterar o resultado dos testes?
+
+\section{Hipótese de pesquisa}
+
+Considerando o problema apresentado, a hipótese de pesquisa deste trabalho é enunciada da seguinte forma: é possível reduzir a duplicação de código de teste e o esforço de desenvolvimento por meio de um método de refatoração automática que trate o reuso de código de teste como um problema de otimização global da distribuição de métodos entre classes de teste.
+
+\section{Proposta}
+
+Em linha com a hipótese apresentada, este trabalho propõe a utilização de métricas de similaridade e algoritmos de agrupamento para resolver o problema de otimização global da distribuição de métodos entre classes de teste. As métricas de similaridade permitem identificar testes com código de configuração em comum; os algoritmos de agrupamento, por sua vez, propõem grupos de testes cuja redistribuição maximiza o reuso de código pela estratégia de configuração implícita.
+
+\section{Objetivos}
+
+O objetivo geral deste trabalho consiste em reduzir a duplicação de código de teste e o esforço total de desenvolvimento e manutenção dos testes, sem alterar o resultado dos testes. Para alcançar o objetivo geral, os seguintes objetivos específicos deverão ser alcançados: (1) investigar métricas de similaridade para identificar código de configuração em comum entre testes; (2) investigar algoritmos de agrupamento para propor distribuições de métodos entre classes de teste; (3) propor uma arquitetura em pipeline para refatoração de código de teste; (4) especificar e implementar um framework que instancia essa arquitetura sem alterar o comportamento observado dos testes; e (5) avaliar a abordagem quanto à redução de duplicação e ao esforço de refatoração.
