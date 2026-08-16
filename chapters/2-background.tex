@@ -1,0 +1,147 @@
+\chapter{Fundamentação teórica}
+
+Três tópicos se destacam em nível de importância para este trabalho: teste de software, métricas de similaridade e algoritmos de agrupamento. Neste capítulo são apresentados os principais conceitos envolvendo a implementação de testes automatizados, as diferentes famílias de métricas de similaridade de código e os métodos de agrupamento utilizados para formar grupos de elementos similares.
+
+\section{Teste de software}
+
+Um teste é um procedimento, manual ou automático, que pode ser usado para verificar se um dado sistema em teste (\textit{System Under Test} -- SUT) funciona de acordo com o comportamento esperado. O SUT representa a parte do sistema que está sendo testada. Cada teste deve realizar, inicialmente, uma série de passos para colocar o SUT no estado desejado para que o teste possa ser executado. Os elementos necessários para que o SUT seja colocado no estado desejado recebem o nome de \textit{test fixtures}, ou simplesmente \textit{fixtures}, ou acessórios de teste. A parte da lógica do teste em que os acessórios são criados é chamada de \textit{fixture setup}, ou configuração de acessórios. Após executar a configuração de acessórios, o teste exercita o SUT através da execução da operação que está sendo testada, realiza uma série de verificações para garantir que o SUT funciona de acordo com o comportamento esperado e, por fim, limpa os acessórios.
+
+Os exemplos apresentados neste trabalho são baseados no framework de teste JUnit, disponível para as linguagens Java e Kotlin. Os exemplos utilizam a linguagem Kotlin. A Figura~\ref{code:5-user-repository-tests} apresenta uma classe de teste com dois métodos de teste. A anotação \texttt{@Test} nas linhas 2 e 12 indica ao framework que os métodos anotados correspondem a testes. Essa abordagem segue a definição utilizada por \citeonline{freeman:etal:2009}, na qual, tipicamente, cada teste é separado em um método de teste. Além disso, cada teste pode ser dividido conceitualmente em quatro fases \cite{meszaros:2007}: configuração (\textit{setup}), exercício, verificação e finalização (\textit{tear down}).
+
+\begin{figure}[htb]
+	\centering
+	\lstinputlisting{code/5-user-repository-tests.txt}
+	\caption{Classe de teste com dois métodos que exercitam o repositório de usuários, ilustrando as etapas de configuração, exercício, verificação e finalização}
+	\label{code:5-user-repository-tests}
+	\fonte{Elaborado pelo autor.}
+\end{figure}
+
+Considerando o primeiro teste da Figura~\ref{code:5-user-repository-tests}, as linhas 4 e 5 correspondem à etapa de configuração. Nessa etapa, o SUT deve ser colocado no estado desejado para o teste. É na configuração que os acessórios necessários para o teste são definidos. Nesse caso, a instância da classe \texttt{RepositorioDeUsuario} é um acessório necessário para o teste, e a conexão com o banco de dados é estabelecida na linha 5. A etapa seguinte consiste em exercitar o SUT. É nessa etapa que é executado o que efetivamente será testado. Na Figura~\ref{code:5-user-repository-tests}, a linha 6 corresponde à etapa de exercício do primeiro teste. Na etapa de verificação, o comportamento esperado do sistema é verificado a partir das saídas produzidas pelo SUT ou através de mecanismos que permitam obter o estado interno do SUT (e.g., consultas no banco de dados). No primeiro teste da Figura~\ref{code:5-user-repository-tests}, a verificação ocorre na linha 7. A última etapa consiste em limpar os acessórios definidos na configuração, para evitar que futuras execuções do teste, ou que execuções futuras de outros testes, venham a ser afetadas. No primeiro teste da Figura~\ref{code:5-user-repository-tests}, a finalização ocorre nas linhas 8 e 9, com a remoção do usuário inserido e o encerramento da conexão com o banco de dados.
+
+De acordo com \citeonline{meszaros:2007}, existem estratégias de agrupamento para organizar os testes em classes. Na estratégia \textit{testcase class per feature}, ou classe de teste por funcionalidade da aplicação, os testes que verificam uma mesma funcionalidade, ou um mesmo requisito, são reunidos em uma classe, independentemente da classe de produção exercitada. O objetivo é facilitar a leitura dos testes como especificação daquela funcionalidade. Na estratégia \textit{testcase class per class}, ou classe de teste por classe da aplicação, cada classe de produção possui uma classe de teste correspondente, que concentra os testes dos seus métodos. Essa organização simplifica a correspondência entre o código de produção e o código de teste. Entretanto, os testes da mesma classe podem exigir acessórios distintos entre si. Na estratégia \textit{testcase class per fixture}, ou classe de teste por acessório, os testes são agrupados pelo estado inicial de que necessitam. Assim, testes que utilizam acessórios semelhantes ficam na mesma classe, o que permite centralizar a configuração comum, em especial pela estratégia de configuração implícita.
+
+O manifesto da automação de testes \cite{meszaros:etal:2003} apresenta características esperadas dos testes automatizados. Os testes devem ser autoverificáveis (i.e., cada teste reporta o próprio resultado); repetíveis, de modo que possam ser executados múltiplas vezes; robustos, produzindo resultados consistentes para o mesmo código de aplicação; e independentes, permitindo que cada teste seja executado isoladamente ou em conjunto com outros testes, em qualquer ordem. Inovações na atividade de teste devem preservar essas qualidades.
+
+\subsection{Categorias e estratégias de configuração de acessórios}
+
+A configuração de acessórios compreende a lógica do teste em que os acessórios são criados. Cada teste possui uma configuração de acessórios, que consiste na criação dos acessórios que serão utilizados no teste. A configuração de acessórios de um teste pode ser realizada através de diferentes estratégias, podendo ser uma ou mais estratégias ao mesmo tempo. Um dos problemas que afetam a manutenibilidade do código de teste é a duplicação do código de configuração de acessórios. Nem sempre é simples ou possível evitar esse tipo de problema, porém existem diferentes estratégias de configuração de acessórios que podem ser utilizadas para reduzir a duplicação de código.
+
+\citeonline{meszaros:2007} divide as estratégias de configuração de acessórios em duas categorias: \textit{fresh fixture setup}, ou configuração de acessórios novos, e \textit{shared fixture construction}, ou configuração de acessórios compartilhados. Em ambas as categorias existem estratégias que possibilitam o reuso de código. Entretanto, apenas na configuração de acessórios compartilhados é possível o reuso de execução. A categoria configuração de acessórios novos é composta por três estratégias: \textit{inline setup}, ou configuração local; \textit{implicit setup}, ou configuração implícita; e \textit{delegated setup}, ou configuração delegada. Nessa categoria há apenas a possibilidade de reuso de código, mas não de reuso de execução. Já as estratégias da configuração de acessórios compartilhados realizam a criação de acessórios que podem ser criados uma única vez e reutilizados entre várias execuções de teste distintas.
+
+\subsubsection{Estratégia configuração local}
+
+Na estratégia configuração local, os acessórios são criados dentro do próprio método de teste. Em geral, essa estratégia é utilizada em testes que necessitam de acessórios muito específicos ou no desenvolvimento dos primeiros testes, em que ainda não existe a necessidade de reuso de acessórios. A Figura~\ref{code:6-inline-setup-test} mostra um exemplo de teste em que a estratégia configuração local é utilizada. As linhas 4 e 5 contêm a configuração de acessórios do teste. Destaca-se que, na estratégia configuração local, a configuração de acessórios é realizada diretamente no método de teste.
+
+\begin{figure}[htb]
+	\centering
+	\lstinputlisting{code/6-inline-setup-test.txt}
+	\caption{Método de teste com configuração local, na qual os acessórios são criados no próprio método}
+	\label{code:6-inline-setup-test}
+	\fonte{Elaborado pelo autor.}
+\end{figure}
+
+Como os acessórios são criados diretamente no método de teste, torna-se fácil compreender a relação de causa e efeito entre os acessórios e as saídas do SUT. Entretanto, a longo prazo, essa estratégia tende a aumentar a duplicação de código, uma vez que diversos testes podem utilizar acessórios idênticos ou muito similares. Além disso, essa estratégia pode dificultar a compreensão do teste nos casos em que os acessórios forem muito complexos, uma vez que a quantidade de código aumenta e se torna mais difícil compreender o papel do acessório no teste.
+
+\subsubsection{Estratégia configuração implícita}
+
+Na estratégia configuração implícita, os acessórios são criados através de um método especial, comumente denominado de \textit{setup method}, ou método de configuração, pertencente à classe de teste e executado antes de cada método de teste. A Figura~\ref{code:7-implicit-setup-test} apresenta um exemplo da estratégia configuração implícita. Nesse exemplo, o método \texttt{configurar} da linha 5 representa o método de configuração. O atributo \texttt{bb} declarado na linha 2 é utilizado para permitir que o acessório seja manuseável pelos testes da classe. Quando um teste da classe é executado, o framework fica responsável por descobrir e executar o método de configuração. No JUnit, a anotação \texttt{@BeforeEach} é utilizada para indicar o método de configuração.
+
+\begin{figure}[htb]
+	\centering
+	\lstinputlisting{code/7-implicit-setup-test.txt}
+	\caption{Classe de teste com configuração implícita, na qual os acessórios são criados em um método de configuração executado antes de cada teste}
+	\label{code:7-implicit-setup-test}
+	\fonte{Elaborado pelo autor.}
+\end{figure}
+
+A vantagem dessa estratégia é promover o reuso de acessórios entre testes de uma classe. Porém, para utilizar essa estratégia, os testes que utilizam os mesmos acessórios devem ser agrupados na mesma classe. Isso pode trazer uma complicação a longo prazo, pois se torna cada vez mais difícil agrupar testes que necessitem exatamente dos mesmos acessórios. Com facilidade, alguns testes irão necessitar de acessórios específicos somente para eles. Além disso, nem sempre é possível evitar a duplicação de código através dessa estratégia, uma vez que um determinado teste pode ter acessórios similares a dois outros testes que, por sua vez, não possuam acessórios similares entre si.
+
+\citeonline{greiler:etal:2013:a} apresenta \textit{test smells}, ou fedores de teste, que podem dificultar a manutenibilidade do código de teste quando essa estratégia é utilizada. Um dos principais problemas apontados é o \textit{general fixture smell}, ou fedor de acessórios generalizados, que ocorre quando existem acessórios dentro do método de configuração que são necessários apenas para alguns testes da classe. Isso pode prejudicar a legibilidade dos demais testes, uma vez que existirão mais acessórios do que apenas os necessários.
+
+\subsubsection{Estratégia configuração delegada}
+
+A estratégia configuração delegada utiliza métodos auxiliares responsáveis pela criação dos acessórios. Em geral, esses métodos são disponibilizados através de classes auxiliares, separadas das classes de teste. A Figura~\ref{code:8-delegated-setup-test} apresenta um exemplo da estratégia configuração delegada. O acessório necessário para o teste é criado através do método \texttt{criarBancoDoBrasil}, definido na linha 11. Esse método auxiliar é chamado na linha 4 da classe de teste.
+
+\begin{figure}[htb]
+	\centering
+	\lstinputlisting{code/8-delegated-setup-test.txt}
+	\caption{Método de teste com configuração delegada, na qual a criação dos acessórios é delegada a um método auxiliar}
+	\label{code:8-delegated-setup-test}
+	\fonte{Elaborado pelo autor.}
+\end{figure}
+
+A principal vantagem dessa estratégia é permitir que o mesmo código de teste possa ser utilizado por testes diferentes de classes diferentes. A desvantagem dessa estratégia é que, em alguns casos, a sua utilização pode dificultar a compreensão da relação de causa e efeito entre os acessórios e as saídas do SUT, uma vez que o método auxiliar é, comumente, colocado em uma classe separada do teste.
+
+\subsubsection{Categoria de estratégias de configuração de acessórios compartilhados}
+
+As estratégias da categoria configuração de acessórios compartilhados realizam a criação de acessórios coletivos. Dessa forma, um acessório pode ser criado uma única vez e reutilizado entre várias execuções de teste distintas. Um exemplo descrito por \citeonline{meszaros:2007} é a estratégia \textit{lazy setup}, ou configuração preguiçosa, na qual o primeiro teste cria o acessório e os testes seguintes reutilizam a mesma instância, o que é útil quando a criação do acessório é custosa (e.g., a população de um banco de dados compartilhado entre os testes de uma suíte). Os frameworks de teste atuais não oferecem formas nativas e nem padronizadas para realizar esse tipo de configuração de acessórios. Por isso, é necessário que o desenvolvedor do teste assuma esse papel e passe a gerenciar parte do fluxo de execução dos testes.
+
+\section{Métricas de similaridade}
+
+Métricas de similaridade possuem aplicações em diversas áreas da computação, como reconhecimento facial em imagens \cite{cao:etal:2013}, busca textual \cite{sahami:etal:2006} e recuperação de informação estruturada \cite{dorneles:etal:2004}. Métricas de similaridade determinam o grau de similaridade entre dois elementos, em que o grau de similaridade é um valor entre 0 e 1 que indica o quanto dois elementos são parecidos entre si de acordo com o critério definido pela métrica. Cada métrica de similaridade possui um mecanismo para gerar o grau de similaridade, de modo que cada métrica apresenta uma distribuição específica sobre o domínio de valores. Neste trabalho, pretende-se avaliar a similaridade entre testes através do código de teste. Por isso, métricas de similaridade de código são abordadas a seguir.
+
+\subsection{Métricas de similaridade de código}
+
+Avaliar a similaridade de código é uma atividade que possui propósitos variados, como identificação de fragmentos duplicados de código \cite{roy:etal:2008}, detecção de plágio e verificação de violação de direitos de cópia de software \cite{ottenstein:1976}, recomendação de código \cite{holmes:etal:2005} e outros. \citeonline{ragkhitwetsagul:etal:2018} classificam cinco diferentes abordagens de métricas de similaridade de código: baseadas em medidas do código, baseadas em texto, baseadas em tokens, baseadas em árvore e baseadas em grafo. Nas seções a seguir, essas cinco abordagens são apresentadas.
+
+\subsubsection{Métricas baseadas em medidas do código}
+
+Medidas do código como a quantidade de linhas e a quantidade de variáveis entre duas funções diferentes, podem ser usadas como indicativos de similaridade de código. As abordagens baseadas em medidas do código foram as primeiras relatadas na literatura e foram aplicadas na detecção de similaridade de software. \citeonline{ottenstein:1976} utiliza métricas de similaridade para identificar potenciais equivalências entre programas de alunos de uma disciplina de programação. A técnica contabiliza o número de operandos e operadores, com base na heurística de que a probabilidade de dois programas distintos apresentarem as mesmas contagens de operandos e operadores é baixa. Com isso, a métrica é robusta à renomeação de variáveis.
+
+O problema de identificação de plágios entre trabalhos de disciplinas de programação também é abordado por \citeonline{donaldson:etal:1981}. Nessa abordagem, o número de declarações, chamadas, leituras, atribuições, comandos \texttt{while} e \texttt{if}, e definições de funções é contabilizado para avaliar a similaridade entre programas, permitindo a detecção de semelhanças estruturais.
+
+\subsubsection{Métricas baseadas em texto}
+
+Métricas de similaridade de código baseadas em texto avaliam a similaridade entre dois programas através da análise de sequências de caracteres do código-fonte. \citeonline{roy:etal:2008} propõem a identificação de clones de fragmentos de código através de uma técnica que analisa diretamente o código-fonte. Diferente de abordagens que buscam identificar plágio, a proposta busca encontrar fragmentos de código intencionalmente copiados com o propósito de reuso. A abordagem representa o código como sequências de linhas e computa a similaridade utilizando o algoritmo da subsequência comum mais longa (\textit{Longest Common Subsequence} -- LCS) \cite{hirschberg:1977}. Antes de converter o código em sequências de linhas, a abordagem normaliza o código-fonte, removendo indentação e comentários e padronizando açúcar sintático.
+
+Em outro trabalho, a similaridade entre dois programas é determinada através de uma matriz em que cada linha de um programa é comparada com todas as linhas do outro \cite{ducasse:etal:1999}. Quando duas linhas são idênticas, a entrada correspondente da matriz recebe o valor um; caso contrário, recebe o valor zero.
+
+\subsubsection{Métricas baseadas em tokens}
+
+Assim como as abordagens baseadas em texto, as abordagens baseadas em tokens também avaliam a similaridade entre dois programas através da análise textual do código-fonte. Abordagens baseadas em tokens, no entanto, aumentam o nível de abstração convertendo o código-fonte em sequências de tokens. A utilização de tokens visa normalizar diferenças textuais através da definição de tipos abstratos de constructos textuais (e.g., todos os identificadores ou valores literais presentes no código podem ser representados por um mesmo token).
+
+\citeonline{kamiya:etal:2002} utilizam a abordagem baseada em token na ferramenta CCFinder. A ferramenta é capaz de identificar clones em diferentes linguagens, incluindo C, C++, Java e COBOL. Para cada linguagem suportada, um analisador léxico dedicado é utilizado para tokenizar o código-fonte. O método busca descobrir classes de clones (i.e., fragmentos de código que compartilham uma sequência idêntica de tokens). O resultado é a identificação e extração de rotinas comuns, incentivando o reuso de código.
+
+\subsubsection{Métricas baseadas em árvores}
+
+Diferente das categorias vistas anteriormente, esta categoria de técnicas tem o foco voltado para identificar a similaridade entre dois programas com base na semelhança estrutural entre eles. Nesse sentido, diferenças léxicas são menos relevantes na análise de similaridade. Para avaliar a similaridade entre dois programas são construídas árvores abstratas de sintaxe (\textit{Abstract Syntax Tree} -- AST). As ASTs permitem identificar a similaridade entre dois trechos mesmo com uma alta quantidade de modificações entre eles. A complexidade computacional, entretanto, é mais alta quando comparada com as categorias de técnicas vistas anteriormente.
+
+\citeonline{baxter:etal:1998} utilizam ASTs para identificar clones, ou clones que sofreram modificações, no contexto de programas escritos na linguagem C. O objetivo do trabalho é identificar clones criados intencionalmente, em que um desenvolvedor copia um fragmento existente para construir um novo fragmento semelhante. A detecção automática alerta os desenvolvedores para esses clones, de modo que a duplicação possa ser eliminada via refatoração. A partir das ASTs, a similaridade é computada dividindo o número de nós coincidentes pelo número total de nós. Um limiar de similaridade é então aplicado, e fragmentos cuja similaridade ultrapassa esse limiar são reportados como clones.
+
+\subsubsection{Métricas baseadas em grafo}
+
+Árvores podem ser vistas como uma especialização de grafos. Nesse sentido, métricas de similaridade baseadas em árvores se assemelham às métricas baseadas em grafos, uma vez que ambas permitem capturar aspectos estruturais do código-fonte. As métricas baseadas em grafo, no entanto, possuem como característica adicional a capacidade de identificar similaridade de aspectos semânticos. Essa capacidade adicional ocorre ao custo de maior complexidade computacional, inerente aos algoritmos sobre grafos.
+
+\citeonline{krinke:2001} utiliza grafos para representar a estrutura e o fluxo de dados de programas e, a partir disso, identificar duplicação de código. O objetivo é maximizar a identificação de trechos de código duplicados ainda que exista diferença entre os trechos, minimizando a ocorrência de falsos positivos (i.e., evitar a identificação de dois trechos de código como duplicados quando eles não são semanticamente equivalentes). Para detectar similaridade semântica, o autor utiliza grafos de dependência de programa (\textit{Program Dependence Graph} -- PDG) \cite{ferrante:etal:1987}, em que os nós correspondem a comandos no código e as arestas representam dependências de dados e de fluxo de controle. \citeonline{komondoor:etal:2001} também representam o código-fonte através de PDGs para identificar pares de clones. Ao aplicar algoritmos de detecção de subgrafos isomorfos, a abordagem pode encontrar clones não contíguos, clones com comandos permutados e até clones interdependentes.
+
+\section{Algoritmos de agrupamento}
+
+Agrupamento consiste na tarefa de atribuir padrões a grupos, ou \textit{clusters}, de maneira não supervisionada \cite{jain:etal:1999}. Técnicas de agrupamento são empregadas para formar grupos de elementos mutuamente similares. O objetivo principal é maximizar a similaridade entre elementos do mesmo grupo (similaridade intragrupo) e minimizar a similaridade entre elementos pertencentes a grupos diferentes (similaridade intergrupo). Consequentemente, para uma coleção de entrada de elementos, uma técnica de agrupamento deve gerar, como saída, um conjunto de grupos, cada um contendo um ou mais elementos.
+
+Há uma ampla variedade de métodos de agrupamento. Esses métodos podem ser organizados em seis categorias principais \cite{rokach:etal:2005}: hierárquicos, particionais, baseados em densidade, baseados em modelo, baseados em grade e métodos de computação suave. Cada categoria é caracterizada por um princípio de indução subjacente que conduz a operação dos algoritmos de agrupamento nela contidos.
+
+\subsection{Métodos hierárquicos}
+
+O agrupamento hierárquico forma grupos de maneira recursiva, seja fundindo sucessivamente agrupamentos em grupos maiores, seja dividindo-os em grupos menores. Um método hierárquico aglomerativo comumente citado inicia com $n$ grupos, cada um contendo um único elemento \cite{johnson:etal:2002}. Em seguida, a cada passo, os dois grupos mais similares são combinados. Esse procedimento iterativo continua até que um critério de parada predefinido seja atingido.
+
+A estrutura resultante dos grupos pode ser representada por um diagrama bidimensional em forma de árvore, denominado dendrograma \cite{sibbald:etal:1989}. O dendrograma descreve a sequência de fusões realizadas em diferentes níveis da hierarquia. Em cada nível, os grupos podem ser fundidos utilizando uma de três estratégias de ligação: ligação simples, em que a similaridade se baseia no par de elementos mais próximos entre os grupos; ligação completa, que se apoia na maior distância entre elementos de grupos diferentes; e ligação média, que utiliza a distância média entre todos os pares de elementos dos dois grupos para quantificar a similaridade.
+
+\subsection{Métodos particionais}
+
+Métodos particionais, como K-means \cite{hartigan:etal:1979} e CLARANS \cite{ng:etal:2002}, partem de um conjunto predefinido de grupos e utilizam realocação iterativa para mover elementos de um grupo para outro, com o objetivo de atingir otimalidade global. No K-means, o número de grupos $k$ é informado a priori. Cada grupo é representado por um centróide, calculado como a média dos elementos a ele associados, e cada elemento é atribuído ao centróide mais próximo. Os centróides são então atualizados e o processo de atribuição se repete até que as associações se estabilizem. O CLARANS segue a mesma ideia de partição em $k$ grupos, porém representa cada grupo por um medoide (i.e., um elemento efetivamente presente no conjunto) e explora o espaço de soluções por amostragem aleatória, o que o torna adequado a conjuntos volumosos de dados espaciais.
+
+\subsection{Métodos baseados em densidade}
+
+Métodos baseados em densidade consideram que os grupos correspondem a regiões densas do espaço de dados, separadas por regiões de baixa densidade. O algoritmo DBSCAN (\textit{Density-Based Spatial Clustering of Applications with Noise}) \cite{ester:etal:1996} é um exemplo conhecido dessa categoria. Nesse algoritmo, um ponto é considerado central quando possui um número mínimo de vizinhos em um raio $\varepsilon$; pontos alcançáveis a partir de um ponto central pertencem ao mesmo grupo, e pontos isolados são tratados como ruído. Diferentemente dos métodos particionais, o DBSCAN não exige que o número de grupos seja definido de antemão e é capaz de identificar grupos de formato arbitrário.
+
+\subsection{Métodos baseados em modelo}
+
+Métodos baseados em modelo partem de um modelo matemático para gerar hipóteses e, em seguida, tentam ajustar os dados de agrupamento a esse modelo. Além de descobrir grupos, esses métodos também podem fornecer descrições características para cada grupo. Em geral, são agrupados em dois tipos principais: métodos de árvore de decisão e métodos de redes neurais, como o mapa auto-organizável (\textit{Self-Organizing Map} -- SOM) \cite{kohonen:2013}. Nos métodos de árvore de decisão, o espaço de atributos é particionado de forma recursiva, de modo que cada grupo passa a ser descrito pelas condições que levam até o nó correspondente. No SOM, os elementos são projetados sobre uma grade de neurônios de baixa dimensionalidade; neurônios vizinhos ajustam seus vetores de peso em direção aos padrões apresentados, de forma que regiões contíguas do mapa passam a representar grupos de elementos similares.
+
+\subsection{Métodos baseados em grade}
+
+Métodos baseados em grade, como STING (\textit{Statistical Information Grid}) \cite{wang:etal:1997}, derivam grupos a partir de um conjunto finito de células dispostas em uma estrutura de grade. O espaço de dados é dividido em células retangulares em múltiplos níveis de resolução, e cada célula armazena estatísticas resumidas dos elementos que contém (e.g., contagem, média e extremos). O agrupamento opera sobre essas estatísticas, sem percorrer novamente cada elemento. O principal benefício desses métodos é a alta velocidade de processamento.
+
+\subsection{Métodos de computação suave}
+
+Métodos de computação suave incluem agrupamento fuzzy, recozimento simulado (\textit{simulated annealing} -- SA) \cite{kirkpatrick:etal:1983} e outras técnicas de otimização estocástica. No agrupamento fuzzy, um elemento pode pertencer a mais de um grupo simultaneamente, com graus de pertinência que quantificam a força dessa associação. O recozimento simulado trata o agrupamento como um problema de otimização: partições candidatas são perturbadas de forma aleatória e, no início do processo, soluções piores podem ser aceitas para escapar de mínimos locais; a probabilidade de aceitar uma solução pior diminui gradualmente, à medida que um parâmetro análogo à temperatura é reduzido.

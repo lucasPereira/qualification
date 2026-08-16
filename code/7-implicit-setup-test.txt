@@ -1,0 +1,15 @@
+class TesteCriarBancoComConfiguracaoImplicita {
+  private lateinit var bb: Banco
+
+  @BeforeEach
+  fun configurar() {
+    val sistemaBancario = SistemaBancario()
+    bb = sistemaBancario.criarBanco("Banco do Brasil", Moeda.BRL)
+  }
+
+  @Test
+  fun criarBanco() {
+    assertEquals("Banco do Brasil", bb.obterNome())
+    assertEquals(Moeda.BRL, bb.obterMoeda())
+  }
+}

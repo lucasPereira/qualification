@@ -11,7 +11,8 @@ The project is a qualification manuscript, not an application codebase. The main
 These paths are the usual edit targets. Class files are template infrastructure; change them only when the build or the user requires it.
 
 - `qualification.tex` — document root.
-- `*.tex` chapters — body text included with `\input{}` from `qualification.tex`.
+- `sections/*.tex` — pre-textual sections included with `\input{}` from `qualification.tex`.
+- `chapters/*.tex` — body text included with `\input{}` from `qualification.tex`.
 - `qualification.bib` — references cited from the manuscript.
 - `ufsc-thesis-rn46-2019.cls`, `template-guide.pdf` — UFSC template.
 
@@ -25,10 +26,12 @@ These paths are the usual edit targets. Class files are template infrastructure;
 
 ## Build
 
-After substantive edits, compile when possible and check the PDF for unresolved references, missing citations, and serious overfull boxes.
+The PDF is the document the user reads. After every change to `.tex`, `.bib`, listings, or other included sources, recompile so `qualification.pdf` matches the sources.
 
 ```bash
 latexmk -pdf qualification.tex
 ```
+
+Check the PDF for unresolved references, missing citations, and serious overfull boxes.
 
 **Do not commit build artifacts.** Unless the user asks, omit `.aux`, `.bbl`, `.blg`, `.fdb_latexmk`, `.fls`, `.log`, and `.toc`.

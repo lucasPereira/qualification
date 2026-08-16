@@ -1,0 +1,15 @@
+class TesteCriarBancoComConfiguracaoDelegada {
+  @Test
+  fun criarBanco() {
+    val bb = Auxiliar.criarBancoDoBrasil()
+    assertEquals("Banco do Brasil", bb.obterNome())
+    assertEquals(Moeda.BRL, bb.obterMoeda())
+  }
+}
+
+object Auxiliar {
+  fun criarBancoDoBrasil(): Banco {
+    val sistemaBancario = SistemaBancario()
+    return sistemaBancario.criarBanco("Banco do Brasil", Moeda.BRL)
+  }
+}

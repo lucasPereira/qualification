@@ -1,0 +1,9 @@
+class TesteCriarBancoComConfiguracaoLocal {
+  @Test
+  fun criarBanco() {
+    val sistemaBancario = SistemaBancario()
+    val bb = sistemaBancario.criarBanco("Banco do Brasil", Moeda.BRL)
+    assertEquals("Banco do Brasil", bb.obterNome())
+    assertEquals(Moeda.BRL, bb.obterMoeda())
+  }
+}

@@ -1,0 +1,21 @@
+class TesteRepositorioDeUsuario {
+  @Test
+  fun deveInserirUsuario() {
+    val repositorio = RepositorioDeUsuario()
+    repositorio.conectar()
+    val inserido = repositorio.inserir("Alice")
+    assertTrue(inserido)
+    repositorio.remover("Alice")
+    repositorio.desconectar()
+  }
+
+  @Test
+  fun deveRemoverUsuario() {
+    val repositorio = RepositorioDeUsuario()
+    repositorio.conectar()
+    repositorio.inserir("Alice")
+    val removido = repositorio.remover("Alice")
+    assertTrue(removido)
+    repositorio.desconectar()
+  }
+}
