@@ -1,0 +1,46 @@
+class TesteSistemaBancario {
+  private lateinit var sistemaBancario: SistemaBancario
+  private lateinit var bb: Banco
+  private lateinit var conta: Conta
+
+  @BeforeEach
+  fun configurar() {
+    sistemaBancario = SistemaBancario()
+    bb = sistemaBancario.criarBanco("Banco do Brasil", Moeda.BRL)
+    conta = bb.criarConta("Alice")
+  }
+
+  @Test
+  fun propriedadesDoBanco() {
+    assertEquals("Banco do Brasil", bb.obterNome(), "nome")
+    assertEquals(Moeda.BRL, bb.obterMoeda(), "moeda")
+  }
+
+  @Test
+  fun dadosDoBanco() {
+    assertEquals("Banco do Brasil", bb.obterNome())
+    assertEquals(Moeda.BRL, bb.obterMoeda())
+    assertEquals(1, sistemaBancario.contarBancos())
+  }
+
+  @Test
+  fun nomeDoBanco() {
+    assertEquals("Banco do Brasil", bb.obterNome(), "Banco do Brasil")
+    val itau = sistemaBancario.criarBanco("Itau", Moeda.BRL)
+    assertEquals("Itau", itau.obterNome(), "Itau")
+    val santander = sistemaBancario.criarBanco("Santander", Moeda.BRL)
+    assertEquals("Santander", santander.obterNome(), "Santander")
+  }
+
+  @Test
+  fun moedaEQuantidadeDeBancos() {
+    assertEquals(Moeda.BRL, bb.obterMoeda(), "moeda")
+    assertEquals(1, sistemaBancario.contarBancos(), "quantidade")
+  }
+
+  @Test
+  fun saldoDaConta() {
+    conta.depositar(100.0)
+    assertEquals(100.0, conta.obterSaldo())
+  }
+}
