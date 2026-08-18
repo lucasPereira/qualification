@@ -1,0 +1,199 @@
+digraph RozaClassDiagram {
+  graph [
+    bgcolor="white",
+    rankdir=TB,
+    splines=true,
+    nodesep="0.45",
+    ranksep="0.55",
+    margin="0.08",
+    pad="0.10",
+    charset="UTF-8",
+    fontname="Arial",
+    fontsize=16
+  ];
+
+  node [
+    shape=plain,
+    fontname="Arial",
+    fontsize=13
+  ];
+
+  edge [
+    color="#65717d",
+    fontname="Arial",
+    fontsize=11,
+    fontcolor="#202833"
+  ];
+
+  subgraph cluster_loading {
+    label="loading";
+    labelloc="t";
+    fontsize=15;
+    fontname="Arial";
+    color="#7f8c99";
+    penwidth=1.2;
+    style="rounded";
+    margin="18";
+
+    CodeFileLoader [
+      label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="8" COLOR="#7f8c99" BGCOLOR="#f6f7f9">
+          <TR><TD ALIGN="CENTER"><I>«interface»</I><BR/><B>CodeFileLoader</B></TD></TR>
+          <TR><TD ALIGN="LEFT">+ load(): LoadedCodeFiles</TD></TR>
+        </TABLE>
+      >
+    ];
+
+    LoadedCodeFiles [
+      label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="8" COLOR="#7f8c99" BGCOLOR="#f6f7f9">
+          <TR><TD ALIGN="CENTER"><B>LoadedCodeFiles</B></TD></TR>
+          <TR><TD ALIGN="LEFT">− codeFiles: List&lt;CodeFile&gt;</TD></TR>
+          <TR><TD ALIGN="LEFT">+ codeFiles(): List&lt;CodeFile&gt;</TD></TR>
+        </TABLE>
+      >
+    ];
+
+    CodeFile [
+      label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="8" COLOR="#7f8c99" BGCOLOR="#f6f7f9">
+          <TR><TD ALIGN="CENTER"><B>CodeFile</B></TD></TR>
+          <TR><TD ALIGN="LEFT">− source: String<BR ALIGN="LEFT"/>− content: String</TD></TR>
+        </TABLE>
+      >
+    ];
+  }
+
+  subgraph cluster_parsing {
+    label="parsing";
+    labelloc="t";
+    fontsize=15;
+    fontname="Arial";
+    color="#7f8c99";
+    penwidth=1.2;
+    style="rounded";
+    margin="18";
+
+    TestClassParser [
+      label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="8" COLOR="#7f8c99" BGCOLOR="#f6f7f9">
+          <TR><TD ALIGN="CENTER"><I>«interface»</I><BR/><B>TestClassParser</B></TD></TR>
+          <TR><TD ALIGN="LEFT">+ parse(codeFiles: LoadedCodeFiles): ParsedTestClasses</TD></TR>
+        </TABLE>
+      >
+    ];
+
+    ParsedTestClasses [
+      label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="8" COLOR="#7f8c99" BGCOLOR="#f6f7f9">
+          <TR><TD ALIGN="CENTER"><B>ParsedTestClasses</B></TD></TR>
+          <TR><TD ALIGN="LEFT">− testClasses: List&lt;TestClass&gt;<BR ALIGN="LEFT"/>− violations: List&lt;TestCodeViolation&gt;</TD></TR>
+          <TR><TD ALIGN="LEFT">+ testClasses(): List&lt;TestClass&gt;<BR ALIGN="LEFT"/>+ violations(): List&lt;TestCodeViolation&gt;</TD></TR>
+        </TABLE>
+      >
+    ];
+
+    TestClass [
+      label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="8" COLOR="#7f8c99" BGCOLOR="#f6f7f9">
+          <TR><TD ALIGN="CENTER"><B>TestClass</B></TD></TR>
+          <TR><TD ALIGN="LEFT">− name: String<BR ALIGN="LEFT"/>− fields: List&lt;Field&gt;<BR ALIGN="LEFT"/>− testMethods: List&lt;TestMethod&gt;</TD></TR>
+        </TABLE>
+      >
+    ];
+
+    TestCodeViolation [
+      label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="8" COLOR="#7f8c99" BGCOLOR="#f6f7f9">
+          <TR><TD ALIGN="CENTER"><B>TestCodeViolation</B></TD></TR>
+          <TR><TD ALIGN="LEFT">− scope: ViolationScope<BR ALIGN="LEFT"/>− testClassName: String<BR ALIGN="LEFT"/>− description: String</TD></TR>
+        </TABLE>
+      >
+    ];
+  }
+
+  subgraph cluster_decomposition {
+    label="decomposition";
+    labelloc="t";
+    fontsize=15;
+    fontname="Arial";
+    color="#7f8c99";
+    penwidth=1.2;
+    style="rounded";
+    margin="18";
+
+    TestCaseDecomposer [
+      label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="8" COLOR="#7f8c99" BGCOLOR="#f6f7f9">
+          <TR><TD ALIGN="CENTER"><I>«interface»</I><BR/><B>TestCaseDecomposer</B></TD></TR>
+          <TR><TD ALIGN="LEFT">+ decompose(parsedTestClasses: ParsedTestClasses): DecomposedTestCases</TD></TR>
+        </TABLE>
+      >
+    ];
+
+    DecomposedTestCases [
+      label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="8" COLOR="#7f8c99" BGCOLOR="#f6f7f9">
+          <TR><TD ALIGN="CENTER"><B>DecomposedTestCases</B></TD></TR>
+          <TR><TD ALIGN="LEFT">− testCases: List&lt;TestCase&gt;</TD></TR>
+          <TR><TD ALIGN="LEFT">+ testCases(): List&lt;TestCase&gt;</TD></TR>
+        </TABLE>
+      >
+    ];
+
+    TestCase [
+      label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="8" COLOR="#7f8c99" BGCOLOR="#f6f7f9">
+          <TR><TD ALIGN="CENTER"><B>TestCase</B></TD></TR>
+          <TR><TD ALIGN="LEFT">− name: String<BR ALIGN="LEFT"/>− body: CodeBlock<BR ALIGN="LEFT"/>− sourceTestClass: TestClass</TD></TR>
+        </TABLE>
+      >
+    ];
+  }
+
+  subgraph cluster_measurement {
+    label="measurement";
+    labelloc="t";
+    fontsize=15;
+    fontname="Arial";
+    color="#7f8c99";
+    penwidth=1.2;
+    style="rounded";
+    margin="18";
+
+    TestCaseSimilarityMeasurer [
+      label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="8" COLOR="#7f8c99" BGCOLOR="#f6f7f9">
+          <TR><TD ALIGN="CENTER"><I>«interface»</I><BR/><B>TestCaseSimilarityMeasurer</B></TD></TR>
+          <TR><TD ALIGN="LEFT">+ measure(testCases: DecomposedTestCases): TestCaseSimilarityMatrix</TD></TR>
+        </TABLE>
+      >
+    ];
+
+    TestCaseSimilarityMatrix [
+      label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="8" COLOR="#7f8c99" BGCOLOR="#f6f7f9">
+          <TR><TD ALIGN="CENTER"><B>TestCaseSimilarityMatrix</B></TD></TR>
+          <TR><TD ALIGN="LEFT">− testCases: List&lt;TestCase&gt;<BR ALIGN="LEFT"/>− similarities: double[]</TD></TR>
+          <TR><TD ALIGN="LEFT">+ size(): int<BR ALIGN="LEFT"/>+ testCaseAt(index: int): TestCase<BR ALIGN="LEFT"/>+ similarity(sourceIndex: int, targetIndex: int): double</TD></TR>
+        </TABLE>
+      >
+    ];
+  }
+
+  CodeFileLoader -> LoadedCodeFiles [style=dashed, arrowhead=vee];
+  LoadedCodeFiles -> CodeFile [dir=both, arrowhead=none, arrowtail=diamond, taillabel="1", headlabel="0..*"];
+
+  TestClassParser -> LoadedCodeFiles [style=dashed, arrowhead=vee];
+  TestClassParser -> ParsedTestClasses [style=dashed, arrowhead=vee];
+  ParsedTestClasses -> TestClass [dir=both, arrowhead=none, arrowtail=diamond, taillabel="1", headlabel="0..*"];
+  ParsedTestClasses -> TestCodeViolation [dir=both, arrowhead=none, arrowtail=diamond, taillabel="1", headlabel="0..*"];
+
+  TestCaseDecomposer -> ParsedTestClasses [style=dashed, arrowhead=vee];
+  TestCaseDecomposer -> DecomposedTestCases [style=dashed, arrowhead=vee];
+  DecomposedTestCases -> TestCase [dir=both, arrowhead=none, arrowtail=diamond, taillabel="1", headlabel="0..*"];
+
+  TestCaseSimilarityMeasurer -> DecomposedTestCases [style=dashed, arrowhead=vee];
+  TestCaseSimilarityMeasurer -> TestCaseSimilarityMatrix [style=dashed, arrowhead=vee];
+  TestCaseSimilarityMatrix -> TestCase [style=dashed, arrowhead=vee];
+}

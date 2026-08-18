@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="280" viewBox="0 0 1400 280">
+  <defs>
+    <style>
+      .box { fill: #f6f7f9; stroke: #7f8c99; stroke-width: 1.2; }
+      .heading { fill: #202833; font: 700 16px Arial, sans-serif; text-anchor: middle; }
+      .step { fill: #202833; font: 700 15px Arial, sans-serif; text-anchor: middle; }
+      .detail { fill: #202833; font: 14px Arial, sans-serif; text-anchor: middle; }
+      .arrow { fill: none; stroke: #65717d; stroke-width: 1.3; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#65717d"/>
+    </marker>
+  </defs>
+
+  <rect class="box" x="12" y="20" width="176" height="240"/>
+  <rect class="box" x="212" y="20" width="176" height="240"/>
+  <rect class="box" x="412" y="20" width="176" height="240"/>
+  <rect class="box" x="612" y="20" width="176" height="240"/>
+  <rect class="box" x="812" y="20" width="176" height="240"/>
+  <rect class="box" x="1012" y="20" width="176" height="240"/>
+  <rect class="box" x="1212" y="20" width="176" height="240"/>
+
+  <path class="arrow" d="M188 140 H212"/>
+  <path class="arrow" d="M388 140 H412"/>
+  <path class="arrow" d="M588 140 H612"/>
+  <path class="arrow" d="M788 140 H812"/>
+  <path class="arrow" d="M988 140 H1012"/>
+  <path class="arrow" d="M1188 140 H1212"/>
+
+  <text class="heading" x="100" y="52">Etapa 1:</text>
+  <text class="heading" x="100" y="85">Carregamento</text>
+  <text class="step" x="100" y="140">1. Carregar</text>
+  <text class="detail" x="100" y="172">Arquivos de</text>
+  <text class="detail" x="100" y="192">c&#243;digo</text>
+
+  <text class="heading" x="300" y="52">Etapa 2:</text>
+  <text class="heading" x="300" y="74">An&#225;lise</text>
+  <text class="heading" x="300" y="96">sint&#225;tica</text>
+  <text class="step" x="300" y="140">2. Analisar</text>
+  <text class="detail" x="300" y="172">Classes de teste</text>
+
+  <text class="heading" x="500" y="52">Etapa 3:</text>
+  <text class="heading" x="500" y="85">Decomposi&#231;&#227;o</text>
+  <text class="step" x="500" y="140">3. Decompor</text>
+  <text class="detail" x="500" y="172">Testes</text>
+
+  <text class="heading" x="700" y="52">Etapa 4:</text>
+  <text class="heading" x="700" y="85">Medi&#231;&#227;o</text>
+  <text class="step" x="700" y="140">4. Medir</text>
+  <text class="detail" x="700" y="172">Matriz de</text>
+  <text class="detail" x="700" y="192">similaridade</text>
+
+  <text class="heading" x="900" y="52">Etapa 5:</text>
+  <text class="heading" x="900" y="85">Agrupamento</text>
+  <text class="step" x="900" y="140">5. Agrupar</text>
+  <text class="detail" x="900" y="172">Grupos</text>
+
+  <text class="heading" x="1100" y="52">Etapa 6:</text>
+  <text class="heading" x="1100" y="85">Refatora&#231;&#227;o</text>
+  <text class="step" x="1100" y="140">6. Refatorar</text>
+  <text class="detail" x="1100" y="172">Classes de teste</text>
+  <text class="detail" x="1100" y="192">refatoradas</text>
+
+  <text class="heading" x="1300" y="52">Etapa 7:</text>
+  <text class="heading" x="1300" y="85">Escrita</text>
+  <text class="step" x="1300" y="140">7. Escrever</text>
+  <text class="detail" x="1300" y="172">Arquivos de</text>
+  <text class="detail" x="1300" y="192">c&#243;digo refatorados</text>
+</svg>
