@@ -56,3 +56,16 @@
     {Ú}{{\'U}}1
     {Ç}{{\c{C}}}1
 }
+
+\lstdefinestyle{violation}{
+  language=Java,
+  numbers=none,
+  frame=single,
+  rulecolor=\color{codegray},
+  nolol,
+  basicstyle=\ttfamily\scriptsize,
+  aboveskip=0.5em,
+  belowskip=0.5em,
+  xleftmargin=0pt
+}
+\lstnewenvironment{violationexample}{\lstset{style=violation}}{}

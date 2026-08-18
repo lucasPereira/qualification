@@ -1,0 +1,356 @@
+\chapter{Violações de código de teste registradas na análise sintática}
+\label{appendix:test-code-violations}
+
+Este apêndice detalha as violações mencionadas no \autoref{chapter:proposal}. Cada subseção apresenta a condição que caracteriza uma violação, o motivo de sua adoção e um exemplo.
+
+\section{Violações de classe}
+\label{appendix:class-violations}
+
+Uma violação de classe é registrada quando o elemento identificado afeta a classe como um todo, o arquivo que a declara ou algum elemento compartilhado por seus testes. Nesse caso, todos os métodos de teste da classe são excluídos das etapas seguintes do pipeline.
+
+\subsection{Importação com curinga}
+
+Ocorre quando o arquivo declara uma importação com curinga. Essa violação foi adotada porque a transformação pode impedir a compilação ou mudar o significado dos nomes usados pelos testes. O Róża analisa a sintaxe, mas não resolve cada nome para o tipo ao qual ele se refere. No trecho, o uso de \texttt{List} não registra junto ao nome que o tipo foi obtido de \texttt{java.util.*}. Se o teste for movido sem esse curinga, a classe gerada não compila. Se todos os curingas das diferentes classes de origem forem copiados, dois pacotes podem oferecer tipos com o mesmo nome e tornar a referência ambígua. Essa cópia também pode introduzir importações não utilizadas na classe gerada. Uma importação explícita identifica o tipo pretendido e permite qualificá-lo quando necessário; o curinga não oferece essa informação ao Róża. Por isso, o recurso é recusado para evitar que a refatoração produza testes que não compilem ou passem a referenciar outro tipo.
+
+\begin{violationexample}
+import java.util.*;
+List contas;
+\end{violationexample}
+
+\subsection{Mais de uma classe de nível superior no mesmo arquivo}
+
+Ocorre quando o arquivo declara mais de uma classe de nível superior. Embora Java permita essa construção, este trabalho a considera uma má prática, pois o arquivo deixa de corresponder a uma única unidade de código. No trecho, \texttt{TesteConta} e \texttt{TesteBanco} possuem testes e configurações independentes. Interpretar cada classe separadamente e gerar um arquivo para cada uma seria possível, mas exigiria que o carregamento deixasse de tratar cada arquivo como uma única classe de teste. Esse suporte foi excluído tanto para manter a correspondência entre arquivo e classe quanto para simplificar a implementação do Róża.
+
+\begin{violationexample}
+class TesteConta {
+    Conta conta;
+    @Before void criaConta() { conta = new Conta(); }
+    @Test void deposita() { conta.depositar(10); }
+}
+class TesteBanco {
+    Banco banco;
+    @Before void criaBanco() { banco = new Banco(); }
+    @Test void abre() { banco.abrir(); }
+}
+\end{violationexample}
+
+\subsection{Classe aninhada}
+
+Ocorre quando uma classe de teste declara outra classe em seu interior. Essa violação foi adotada para simplificar a implementação do Róża. Seu modelo representa cada classe de teste por um único conjunto de atributos, métodos de configuração e métodos de teste, sem registrar relações entre classes externas e internas. No trecho, antes de executar \texttt{cadastra}, o JUnit 5 executa primeiro \texttt{criaBanco}, da classe externa, e depois \texttt{criaConta}, da classe interna. O suporte seria possível, mas exigiria representar os diferentes níveis da classe aninhada e combinar suas configurações na ordem determinada pelo JUnit. Essa extensão não integra o escopo deste trabalho.
+
+\begin{violationexample}
+class TesteBanco {
+    Banco banco;
+    @BeforeEach void criaBanco() { banco = new Banco(); }
+    @Nested class Cadastro {
+        Conta conta;
+        @BeforeEach void criaConta() { conta = new Conta(); }
+        @Test void cadastra() { banco.cadastrar(conta); }
+    }
+}
+\end{violationexample}
+
+\subsection{Herança}
+
+Ocorre quando a classe de teste estende outra classe. Essa violação foi adotada para simplificar a implementação, evitar que uma configuração herdada seja omitida durante a refatoração e desencorajar o uso de herança em testes. Nesse contexto, a herança constitui uma má prática porque oculta dependências de configuração e acopla os testes à hierarquia de classes. O modelo do Róża não registra a superclasse nem associa os elementos herdados aos testes da subclasse. No trecho, \texttt{TesteBanco} herda o campo \texttt{banco} e o método \texttt{criaBanco} de \texttt{TesteBaseBanco}. Antes de executar \texttt{abre}, o JUnit executa o \texttt{@Before} herdado. O suporte seria possível, mas exigiria localizar as superclasses, percorrer toda a hierarquia e incorporar seus atributos e métodos de configuração na ordem correta. Sem esse tratamento, o teste refatorado poderia perder a configuração herdada e mudar de comportamento.
+
+\begin{violationexample}
+// TesteBaseBanco.java
+class TesteBaseBanco {
+    Banco banco;
+    @Before void criaBanco() { banco = new Banco(); }
+}
+// TesteBanco.java
+class TesteBanco extends TesteBaseBanco {
+    @Test void abre() { banco.abrir(); }
+}
+\end{violationexample}
+
+\subsection{Classe abstrata}
+
+Ocorre quando a classe de teste é declarada como abstrata. Uma classe abstrata pode servir de base para subclasses, mas não pode ser instanciada diretamente pelo JUnit. Como o Róża não trata herança e redistribui testes entre classes concretas, uma classe abstrata isolada não constitui uma unidade de teste com significado dentro do modelo adotado. Por isso, ela não pode ser uma classe de origem nem o destino gerado pela refatoração.
+
+\begin{violationexample}
+abstract class TesteBanco {
+    @Test void abre() {}
+}
+\end{violationexample}
+
+\subsection{Classe genérica}
+
+Ocorre quando a classe de teste declara parâmetros de tipo. Essa construção não possui significado no modelo adotado, que redistribui métodos entre classes concretas. No trecho, \texttt{T} não identifica um tipo concreto para \texttt{valor}. Além disso, testes provenientes de classes distintas podem declarar parâmetros com nomes ou limites diferentes, sem que exista uma escolha única para a classe resultante. Como o Róża não instancia combinações de tipos nem preserva vínculos genéricos entre classes de origem, não há uma transformação definida para esse caso.
+
+\begin{violationexample}
+class TesteRepositorio<T> {
+    Repositorio<T> repositorio;
+    T valor;
+    @Test void armazena() { repositorio.salvar(valor); }
+}
+\end{violationexample}
+
+\subsection{Anotação na classe}
+
+Ocorre quando a classe de teste possui uma anotação. Essa violação foi adotada porque a anotação pode alterar a descoberta, a instanciação ou o ciclo de vida dos testes, e ignorá-la durante a redistribuição pode mudar o comportamento observado. No trecho, \texttt{@TestInstance} configura um ciclo de vida por classe, no qual o JUnit 5 usa a mesma instância de \texttt{TesteBanco} em todos os métodos, em vez de criar uma para cada teste. Copiar a anotação para todas as classes geradas ou removê-la pode, respectivamente, ampliar ou eliminar o compartilhamento de estado. Como o Róża não interpreta a semântica das anotações de classe, recusa o caso em vez de produzir uma refatoração potencialmente incorreta.
+
+\begin{violationexample}
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class TesteBanco {
+    Banco banco;
+    @BeforeEach void criaBanco() { banco = new Banco(); }
+    @Test void abre() { banco.abrir(); }
+}
+\end{violationexample}
+
+\subsection{Inicializador de classe}
+
+Ocorre quando a classe declara um inicializador estático. Essa construção introduz estado ou efeitos compartilhados por todos os testes e, por isso, é tratada como uma má prática que pode comprometer sua independência. No trecho, \texttt{Banco.abrir()} executa uma única vez, quando a classe é carregada, e não antes de cada teste. Redistribuir os métodos entre novas classes pode fazer o bloco executar mais vezes ou em outro momento. A violação evita que a refatoração altere esse efeito global e, consequentemente, o resultado dos testes.
+
+\begin{violationexample}
+class TesteBanco {
+    static { Banco.abrir(); }
+    @Test void consulta() {}
+}
+\end{violationexample}
+
+\subsection{Construtor explícito}
+
+Ocorre quando a classe declara um construtor explícito. O Róża considera como configuração implícita apenas os comandos de \texttt{@Before} ou \texttt{@BeforeEach}. O uso do construtor para preparar testes fica fora desse contrato, e seu comportamento pode depender da versão do JUnit e de extensões que controlam a criação ou a injeção de instâncias. No trecho, \texttt{new Banco()} executa durante a construção do objeto, antes do método de configuração implícita. Como a ordem e os efeitos que deveriam ser preservados não estão suficientemente definidos no modelo do Róża, o construtor é recusado para evitar que a refatoração omita ou reposicione essa preparação.
+
+\begin{violationexample}
+class TesteBanco {
+    Banco banco;
+    public TesteBanco() { banco = new Banco(); }
+    @Test void abre() { banco.abrir(); }
+}
+\end{violationexample}
+
+\subsection{Enumerador}
+
+Ocorre quando o arquivo contém um enumerador. O enumerador pode ser um tipo auxiliar utilizado pelos testes, mas o modelo do Róża preserva apenas os elementos da classe de teste e não representa declarações adicionais de tipos. Para suportá-lo, seria necessário identificar quais testes dependem do enumerador e decidir em quais arquivos gerados ele deveria permanecer ou ser copiado. Esse tratamento foi excluído para simplificar a implementação.
+
+\begin{violationexample}
+class TesteConta {
+    enum Status { ATIVO, INATIVO }
+    @Test void ativa() {
+        Status status = Status.ATIVO;
+        assertEquals(Status.ATIVO, status);
+    }
+}
+\end{violationexample}
+
+\subsection{Atributo estático}
+
+Ocorre quando a classe declara um atributo estático. O atributo compartilha o mesmo valor entre todas as instâncias da classe, o que constitui uma má prática quando os testes o alteram e passam a depender da ordem de execução. No trecho, \texttt{a} abre o banco e \texttt{b} fecha a mesma instância. Após a redistribuição, copiar o atributo para várias classes separaria um estado antes compartilhado, enquanto mantê-lo em uma única classe preservaria um acoplamento entre testes que foram movidos. Como ambas as opções podem mudar o resultado observado, o Róża recusa a classe.
+
+\begin{violationexample}
+static Banco banco;
+@Test void a() { banco.abrir(); }
+@Test void b() { banco.fechar(); }
+\end{violationexample}
+
+\subsection{Atributo anotado}
+
+Ocorre quando um atributo possui uma anotação. Essa violação foi adotada porque frameworks e extensões podem usar a anotação para criar, substituir ou destruir o valor do atributo fora do método de configuração implícita. No trecho, \texttt{@TempDir} solicita ao JUnit que forneça um diretório temporário antes do teste. Mover o atributo ou o método sem compreender essa anotação pode eliminar a injeção ou alterar seu ciclo de vida. Como o Róża não interpreta anotações de atributos, recusa o caso para evitar a quebra dos testes refatorados.
+
+\begin{violationexample}
+@TempDir Path pasta;
+\end{violationexample}
+
+\subsection{Atributo inicializado no campo}
+
+Ocorre quando o atributo é inicializado na própria declaração. Essa violação simplifica a implementação ao concentrar a configuração tratada pelo Róża em \texttt{@Before} ou \texttt{@BeforeEach}. No trecho, \texttt{new Banco()} executa durante a criação da instância e antes do método de configuração implícita. Seria possível incorporar a inicialização ao teste decomposto, mas isso exigiria preservar sua posição em relação ao construtor e aos demais inicializadores. Sem esse tratamento, movê-la para outro ponto poderia alterar a ordem da configuração e o comportamento do teste.
+
+\begin{violationexample}
+Banco banco = new Banco();
+\end{violationexample}
+
+\subsection{Método auxiliar}
+
+Ocorre quando a classe declara um método que não é de teste nem de configuração implícita. Essa violação foi adotada para simplificar a implementação, pois tratar o método exigiria analisar chamadas entre métodos e determinar quais comandos do auxiliar pertencem à configuração de cada teste. No trecho, \texttt{deposita} chama \texttt{criarConta}, mas a criação da conta está no corpo do método auxiliar. Copiar somente a chamada para uma nova classe produziria uma referência ausente; copiar ou incorporar o auxiliar sem analisar seus usos poderia duplicar efeitos ou mudar seu escopo. Por isso, o Róża recusa a classe para não gerar testes incompletos.
+
+\begin{violationexample}
+void criarConta() { conta = new Conta(); }
+@Test void deposita() {
+    criarConta();
+    conta.depositar(10);
+}
+\end{violationexample}
+
+\subsection{Método de finalização ou demais métodos de ciclo de vida}
+
+Ocorre quando a classe declara um método de finalização ou outro método de ciclo de vida distinto da configuração implícita. São registradas as anotações \texttt{@After}, \texttt{@AfterEach}, \texttt{@AfterClass}, \texttt{@BeforeClass}, \texttt{@BeforeAll} e \texttt{@AfterAll}. O suporte foi excluído para simplificar a implementação, que considera apenas a configuração executada antes de cada teste. No trecho, \texttt{limpar} executa depois do teste. Se os métodos forem redistribuídos sem que essa finalização acompanhe cada grupo, recursos podem permanecer abertos; se ela for copiada indiscriminadamente, um recurso compartilhado pode ser encerrado mais de uma vez. A violação evita que a refatoração altere o ciclo de vida e quebre os testes.
+
+\begin{violationexample}
+@After public void limpar() { banco.fechar(); }
+\end{violationexample}
+
+\subsection{Mais de um método de configuração implícita}
+
+Ocorre quando a classe declara mais de um método de configuração implícita. O Róża representa a configuração compartilhada como uma única sequência e, para simplificar a implementação, não combina vários métodos \texttt{@Before} ou \texttt{@BeforeEach}. Além disso, a ordem entre esses métodos não deve ser inferida pela posição textual de suas declarações. No trecho, executar \texttt{a} antes de \texttt{b} pode produzir um estado diferente de executar \texttt{b} antes de \texttt{a}. Como o comportamento que a classe gerada deveria preservar não está suficientemente definido pelo código analisado, a violação evita uma mudança na ordem da configuração.
+
+\begin{violationexample}
+@Before void a() { conta = new Conta(); }
+@Before void b() { banco = new Banco(); }
+\end{violationexample}
+
+\subsection{Método de configuração implícita fora do contrato}
+
+Ocorre quando o método de configuração implícita é estático, possui parâmetros ou tem tipo de retorno distinto de \texttt{void}. Essas formas não constituem a configuração implícita convencional adotada pelo Róża. No JUnit 4, elas não atendem ao contrato de \texttt{@Before}; no JUnit 5, alguns parâmetros podem ser fornecidos por extensões, cuja semântica o Róża não interpreta. No trecho, o método estático pertence à classe, e não à instância criada para cada teste. Como não há uma transformação com significado dentro do modelo adotado e o suporte a extensões foi excluído para simplificar a implementação, a classe é recusada.
+
+\begin{violationexample}
+@Before static void criaBanco() { banco = new Banco(); }
+\end{violationexample}
+
+\section{Violações de método}
+\label{appendix:method-violations}
+
+As violações desta seção aplicam-se a um método de teste. O analisador exclui apenas o método afetado, de modo que os demais testes da classe possam seguir no pipeline. Quando a mesma construção ocorre no método de configuração implícita, o analisador registra uma violação de classe, pois a extração da configuração compartilhada ficaria comprometida para todos os testes.
+
+\subsection{Teste parametrizado ou com ciclo de vida distinto}
+
+Ocorre quando o método é parametrizado, repetido, teórico, gerado por fábrica ou definido por um modelo. São registradas as anotações \texttt{@ParameterizedTest}, \texttt{@RepeatedTest}, \texttt{@Theory}, \texttt{@TestFactory} e \texttt{@TestTemplate}. O suporte foi excluído para simplificar o Róża, cujo modelo representa cada método como um único teste sem parâmetros. No trecho, \texttt{aceita} é executado uma vez para cada valor fornecido. Tratar esse caso exigiria representar as invocações produzidas pelo framework e preservar suas fontes, nomes e ciclos de vida. Mover o método como se fosse um teste simples poderia eliminar essas invocações ou mudar os valores recebidos e, portanto, quebrar o teste refatorado.
+
+\begin{violationexample}
+@ParameterizedTest
+@ValueSource(strings = {"ativa", "inativa"})
+void aceita(String valor) {}
+\end{violationexample}
+
+\subsection{Anotação repetida no mesmo método}
+
+Ocorre quando a mesma anotação aparece mais de uma vez no método. Essa construção não possui significado no modelo adotado. Anotações como \texttt{@Test} não são repetíveis em Java, de modo que o trecho não compila e não corresponde a um método de teste executável. Como não há comportamento válido a preservar nem transformação aplicável, o Róża registra a violação.
+
+\begin{violationexample}
+@Test
+@Test
+public void abre() {}
+\end{violationexample}
+
+\subsection{Anotação distinta de teste ou de configuração implícita}
+
+Ocorre quando o método possui uma anotação diferente das anotações de teste e de configuração implícita admitidas pelo Róża. Essa violação foi adotada porque anotações adicionais podem mudar a descoberta, as condições ou o ciclo de vida do teste. No trecho, \texttt{@Disabled} impede a execução de \texttt{abre}. Como o Róża não interpreta a semântica dessas anotações, não pode determinar se basta copiá-las ou se elas dependem de outra anotação, extensão ou configuração da classe. Prosseguir poderia fazer um teste ignorado passar a executar ou produzir outra mudança de comportamento após a refatoração.
+
+\begin{violationexample}
+@Disabled
+@Test
+public void abre() {}
+\end{violationexample}
+
+\subsection{Atributo nas anotações de teste ou de configuração implícita}
+
+Ocorre quando as anotações \texttt{@Test}, \texttt{@Before} ou \texttt{@BeforeEach} recebem atributos. Essa violação evita que a refatoração mude o critério de sucesso ou a forma de execução do teste. No trecho, \texttt{expected} faz \texttt{abre} passar quando seu corpo lança \texttt{Exception}. Se um comando que lança essa exceção for extraído para \texttt{@Before}, ela pode ocorrer fora do ponto ao qual o atributo se aplica. Remover, modificar ou copiar o atributo sem considerar essa relação pode transformar um teste aprovado em reprovado, ou o contrário.
+
+\begin{violationexample}
+@Test(expected = Exception.class)
+public void abre() { banco.abrir(); }
+\end{violationexample}
+
+\subsection{Método de teste fora do contrato}
+
+Ocorre quando o método de teste é privado, estático, sem corpo, possui parâmetros ou tem tipo de retorno distinto de \texttt{void}. Essas formas ficam fora do contrato simplificado do Róża, que representa testes como métodos de instância, com corpo, sem parâmetros e sem retorno. Algumas delas não constituem testes válidos na versão correspondente do JUnit; outras dependem de extensões que fornecem parâmetros ou alteram a execução. No trecho, \texttt{private} impede que o método seja descoberto como um teste convencional. Como o comportamento esperado não está definido pelo modelo adotado, não há uma redistribuição com significado sem interpretar as regras adicionais do framework.
+
+\begin{violationexample}
+@Test private void abre() {}
+\end{violationexample}
+
+\subsection{Laço}
+
+Ocorre na presença de \texttt{for}, \texttt{for-each}, \texttt{while} ou \texttt{do-while}. O suporte foi excluído para simplificar a implementação, que compara a configuração como uma sequência linear de comandos. No trecho, a quantidade de execuções de \texttt{contas.add} depende de \texttt{n}, e o corpo pode ainda alterar variáveis usadas na condição ou depois do laço. Seria possível mover o laço inteiro, mas isso exigiria analisar seu escopo, suas dependências e seu fluxo interno. Sem essa análise, extrair apenas partes coincidentes poderia mudar a quantidade ou a ordem dos efeitos e quebrar o teste.
+
+\begin{violationexample}
+for (int i = 0; i < n; i++) {
+    contas.add(new Conta());
+}
+\end{violationexample}
+
+\subsection{Comando try}
+
+Ocorre na presença de um bloco \texttt{try}. Essa violação simplifica a análise ao excluir fluxos de exceção da sequência linear tratada pelo Róża. No trecho, se \texttt{banco.abrir()} lançar uma exceção, a execução segue para \texttt{catch}; caso contrário, esse bloco não é executado. Seria possível mover o \texttt{try} completo, mas extrair comandos de seu interior ou combiná-lo com trechos de outros testes exigiria preservar os blocos \texttt{catch} e \texttt{finally}, bem como o ponto em que cada exceção é tratada. Uma transformação incompleta poderia mudar o caminho executado e o resultado do teste.
+
+\begin{violationexample}
+try {
+    banco.abrir();
+} catch (Exception execao) {}
+\end{violationexample}
+
+\subsection{Comandos switch, break, continue ou throw explícito}
+
+Ocorre na presença de \texttt{switch}, \texttt{break}, \texttt{continue} ou \texttt{throw} explícito. O suporte foi excluído para manter a configuração como uma sequência linear, sem ramificações ou saltos. No trecho, \texttt{throw} encerra o fluxo normal e impede a execução dos comandos seguintes. Os demais elementos podem selecionar outro ramo, sair de um bloco ou iniciar a próxima iteração. Tratar essas construções exigiria preservar o contexto de controle ao qual pertencem; movê-las isoladamente pode até produzir código inválido ou alterar o caminho executado. A violação evita que a refatoração quebre a compilação ou o comportamento do teste.
+
+\begin{violationexample}
+throw new IllegalStateException();
+\end{violationexample}
+
+\subsection{Bloco sincronizado ou comando rotulado}
+
+Ocorre na presença de um bloco \texttt{synchronized} ou de um comando rotulado. Essas construções foram excluídas para simplificar a implementação e evitar alterações em relações que dependem do contexto original. No trecho, \texttt{synchronized (this)} utiliza a instância da classe como cadeado. Depois de mover o teste, \texttt{this} passa a designar outra instância e pode deixar de sincronizar com o mesmo código. Um rótulo, por sua vez, só tem significado em conjunto com os comandos que podem desviar para ele. Sem uma análise de concorrência e de fluxo, a refatoração poderia mudar a sincronização, invalidar um salto ou alterar o comportamento do teste.
+
+\begin{violationexample}
+synchronized (this) { banco.abrir(); }
+\end{violationexample}
+
+\subsection{Expressão lambda ou referência a método}
+
+Ocorre na presença de uma expressão lambda ou de uma referência a método, salvo quando aparecem dentro de uma asserção. O suporte foi excluído para simplificar a análise de escopo e de execução adiada. No trecho, a lambda captura \texttt{conta} e seu corpo é executado por \texttt{forEach}, não no momento em que a função é declarada. Uma lambda também pode capturar atributos ou variáveis locais cuja disponibilidade muda quando o teste é transferido para outra classe. Sem representar essas capturas e o momento da execução, o Róża poderia mover uma configuração para fora de seu contexto e quebrar o teste.
+
+\begin{violationexample}
+contas.forEach(conta -> conta.ativar());
+\end{violationexample}
+
+\subsection{Classe anônima ou classe local}
+
+Ocorre na presença de uma classe anônima ou de uma classe local. Essa violação foi adotada para simplificar a implementação, pois esses tipos introduzem campos, métodos e escopos próprios dentro do método de teste. No trecho, o corpo de \texttt{run} não executa quando o \texttt{Runnable} é criado, mas apenas quando ele é invocado. Além disso, a classe pode capturar variáveis e a instância que a contém. Mover somente a criação ou extrair comandos de seu corpo pode alterar essas capturas e o momento dos efeitos. Por isso, o Róża recusa o método para evitar uma transformação incompleta.
+
+\begin{violationexample}
+new Runnable() {
+    public void run() { banco.abrir(); }
+};
+\end{violationexample}
+
+\subsection{Expressão explícita this ou super}
+
+Ocorre na presença de \texttt{this} ou \texttt{super} explícitos. Essa violação evita que a mudança de classe altere o objeto ou o método ao qual a expressão se refere. No trecho, a chamada a \texttt{criaBanco} por meio de \texttt{super} depende da hierarquia da classe de origem. Depois da redistribuição, a classe gerada pode ter outra superclasse ou nenhuma, tornando a chamada inválida ou fazendo-a alcançar outra implementação. De modo semelhante, \texttt{this} passa a representar uma instância da nova classe. Como preservar essas referências exigiria manter ou reconstruir o contexto original, o Róża recusa o método para não quebrar sua compilação ou seu comportamento.
+
+\begin{violationexample}
+super.criaBanco();
+\end{violationexample}
+
+\subsection{Criação de Thread, Socket ou URL}
+
+Ocorre na instanciação de \texttt{Thread}, \texttt{Socket} ou \texttt{URL}. O uso direto de concorrência ou rede na configuração constitui uma má prática para testes unitários quando introduz dependência externa, disputa ou espera não controlada. No trecho, \texttt{start} inicia uma execução paralela cuja conclusão não é determinada pela posição textual dos comandos. Redistribuir o teste ou extrair essa criação para um método compartilhado pode mudar a quantidade de instâncias, o momento da conexão ou a relação entre as threads. A violação evita que a refatoração amplifique esses efeitos e produza resultados não determinísticos.
+
+\begin{violationexample}
+new Thread().start();
+\end{violationexample}
+
+\subsection{Chamada de reflexão}
+
+Ocorre na presença de \texttt{Class.forName}, \texttt{getDeclaredMethod}, \texttt{getDeclaredField}, \texttt{getMethod} ou \texttt{getField}. Essa violação evita que a refatoração invalide nomes usados de forma reflexiva. No trecho, \texttt{"Banco"} é uma cadeia de caracteres, e não uma referência de tipo que possa ser atualizada pelo analisador. O mesmo ocorre com nomes de métodos e atributos fornecidos como texto. Se a geração mudar pacotes, classes ou membros, a chamada pode deixar de localizar o alvo sem produzir erro de compilação. Como o Róża não resolve nem reescreve dependências reflexivas, recusa o método para preservar seu comportamento.
+
+\begin{violationexample}
+Class.forName("Banco");
+\end{violationexample}
+
+\subsection{Chamada com efeito colateral de arquivo, rede ou tempo}
+
+Ocorre no uso de \texttt{Files}, \texttt{Paths}, \texttt{DriverManager}, \texttt{URL}, \texttt{Socket}, \texttt{Clock}, \texttt{Instant}, \texttt{LocalDate} ou \texttt{LocalDateTime}. Dependências diretas de arquivo, banco de dados, rede ou relógio constituem uma má prática em testes unitários quando tornam o resultado dependente do ambiente ou do instante da execução. No trecho, \texttt{readAllLines} depende da existência e do conteúdo de um arquivo externo. Extrair ou compartilhar essa chamada pode mudar o momento e a quantidade de acessos, além de fazer testes antes isolados dividirem o mesmo recurso. A violação evita que a refatoração altere esses efeitos e aumente o caráter não determinístico dos testes.
+
+\begin{violationexample}
+Files.readAllLines(path);
+\end{violationexample}
+
+\subsection{Chamada a System}
+
+Ocorre no uso de \texttt{System.currentTimeMillis}, \texttt{System.nanoTime}, \texttt{System.exit} ou \texttt{System.getProperty}. Essas chamadas acessam tempo, propriedades ou controle global da máquina virtual, o que constitui uma má prática quando torna o teste dependente do ambiente ou capaz de encerrar o processo. No trecho, duas execuções de \texttt{currentTimeMillis} podem produzir valores distintos mesmo em testes com código igual. Mover ou compartilhar a chamada altera o instante em que o valor é obtido e pode mudar o resultado observado. Por isso, o Róża recusa o método em vez de refatorar uma dependência global cujos efeitos não consegue preservar.
+
+\begin{violationexample}
+System.currentTimeMillis();
+\end{violationexample}
+
+\subsection{Chamada assíncrona}
+
+Ocorre no uso de \texttt{CompletableFuture} ou \texttt{Executors}. A execução assíncrona constitui uma fonte de não determinismo quando o teste não controla explicitamente a conclusão e os recursos utilizados. No trecho, a tarefa submetida pode continuar enquanto os comandos seguintes já estão em execução. Extrair a criação do executor para a configuração compartilhada pode ainda fazer testes distintos usarem o mesmo pool e interferirem entre si. Como a ordem textual deixa de determinar a ordem dos efeitos, a violação evita que a refatoração altere a concorrência e produza falhas intermitentes.
+
+\begin{violationexample}
+Executors.newSingleThreadExecutor().submit(tarefa);
+\end{violationexample}
