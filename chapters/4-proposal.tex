@@ -53,12 +53,12 @@ No carregamento, a interface \texttt{CodeFileLoader} produz \texttt{LoadedCodeFi
 
 Cada etapa é representada por um contrato de entrada e de saída, e não por uma implementação rígida. As implementações não se invocam mutuamente: um orquestrador consome o artefato produzido por uma etapa e o fornece à seguinte. Com isso, uma implementação de análise sintática pode ser combinada com diferentes implementações de medição sem que qualquer uma delas conheça a outra. Novas linguagens ou métricas de similaridade entram no fluxo pela substituição do contrato correspondente.
 
-A Figura~\ref{figure:roza-screenshot} apresenta a interface gráfica do Róża durante a etapa de medição, na qual é possível selecionar uma métrica de similaridade e inspecionar a configuração de acessórios de cada teste decomposto.
+A Figura~\ref{figure:roza-screenshot} apresenta a interface gráfica do Róża na etapa de decomposição. À esquerda, o resumo das violações registra a contagem de classes e testes afetados, os testes excluídos e os testes aceitos no pipeline. À direita, a aba \textit{Classes} permite inspecionar cada classe de teste e consultar, na aba \textit{Summary}, atributos, configurações, testes e violações associadas.
 
 \begin{figure}[htb]
 	\centering
 	\includegraphics[width=\textwidth]{figures/roza-screenshot.png}
-	\caption{Interface gráfica do Róża na etapa de medição}
+	\caption{Interface gráfica do Róża na etapa de decomposição}
 	\label{figure:roza-screenshot}
 	\fonte{Elaborado pelo autor.}
 \end{figure}
