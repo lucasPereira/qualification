@@ -121,22 +121,14 @@ Na Equação~\ref{equation:lccss-similarity}, $|\alpha|$ e $|\beta|$ corresponde
 \begin{figure}[htb]
 	\centering
 	\includegraphics[width=\textwidth]{figures/lccss-lcs-comparison.png}
-	\caption{Comparação entre a LCS e a LCCSS para duas sequências de comandos}
+	\caption{Comparação entre a LCS e a LCCSS e efeito da extração de um comando não contíguo}
 	\label{figure:lccss-lcs-comparison}
 	\fonte{Elaborado pelo autor.}
 \end{figure}
 
-A Figura~\ref{figure:lccss-lcs-comparison} ilustra a diferença entre as duas métricas. Nas sequências $\alpha=\langle A,B,C,D\rangle$ e $\beta=\langle A,B,X,D\rangle$, a LCS contém os comandos $A$, $B$ e $D$, pois preserva sua ordem relativa mesmo diante da intercalação de $C$ e $X$. Com isso, seu grau de similaridade é 0,75. A LCCSS contém apenas $A$ e $B$, pois a igualdade deixa de ser contígua na terceira posição, e atribui grau 0,50. Embora $D$ também seja comum, ele não pode compor, junto com $A$ e $B$, um único bloco inicial extraível sem alterar a ordem de execução de $C$ ou $X$.
+A Figura~\ref{figure:lccss-lcs-comparison} ilustra a diferença entre as duas métricas por meio de dois testes sobre um pedido. As sequências de comandos são $\alpha=\langle A,B,C,D,E\rangle$ e $\beta=\langle A,B,X,D,Y\rangle$. Os comandos $A$ e $B$ criam o pedido e adicionam o primeiro item; $C$ aplica um desconto; $X$ adiciona outro item; $D$ confirma o pedido; e $E$ e $Y$ verificam os respectivos totais. A LCS contém $A$, $B$ e $D$, pois admite o comando comum posterior à divergência, e atribui grau 0,60. A LCCSS contém somente o prefixo $\langle A,B\rangle$ e atribui grau 0,40.
 
-\begin{figure}[htb]
-	\centering
-	\includegraphics[width=\textwidth]{figures/lccss-implicit-setup.png}
-	\caption{Relação entre a LCCSS e a extração para configuração implícita}
-	\label{figure:lccss-implicit-setup}
-	\fonte{Elaborado pelo autor.}
-\end{figure}
-
-A Figura~\ref{figure:lccss-implicit-setup} apresenta a refatoração correspondente. Os comandos $A$ e $B$, identificados pela LCCSS, podem ser movidos para o método de configuração implícita e executados antes de cada teste. Os comandos $C$ e $X$ permanecem em seus métodos de origem. O comando $D$ também permanece duplicado, pois ocorre depois da divergência e sua movimentação para o início poderia alterar o comportamento dos testes. Isso não impede que outra estratégia de refatoração trate trechos comuns posteriores, mas os exclui deliberadamente do critério usado para selecionar candidatos à configuração implícita.
+A parte inferior da figura contrapõe os efeitos das extrações indicadas pelas duas métricas. No ramo da LCS, $A$, $B$ e $D$ são movidos para o método de configuração implícita. Com isso, a confirmação do pedido é executada antes de $C$ e $X$: o teste $\alpha$ tenta aplicar um desconto a um pedido já confirmado, enquanto o teste $\beta$ tenta adicionar um item a esse pedido, e ambos falham. No ramo da LCCSS, somente o prefixo comum contíguo $\langle A,B\rangle$ é extraído. O comando $D$ permanece nos métodos de origem, depois de $C$ e $X$, o que preserva a ordem dos comandos e permite que os dois testes passem.
 
 \subsubsection{Comparação das métricas}
 

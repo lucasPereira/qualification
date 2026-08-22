@@ -1,61 +1,253 @@
 digraph LccssLcsComparison {
-	graph [
-		bgcolor="white",
-		fontname="Helvetica",
-		nodesep=0.45,
-		ranksep=0.55
-	];
-	node [fontname="Helvetica", shape=plain];
-	edge [color="#666666", fontname="Helvetica"];
+    graph [
+        rankdir=TB,
+        bgcolor="white",
+        pad="0",
+        margin="0",
+        nodesep="0.42",
+        ranksep="0.58",
+        splines=line,
+        newrank=true,
+        labelloc=t,
+        labeljust=c,
+        label=<
+            <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="28" CELLPADDING="0">
+                <TR>
+                    <TD VALIGN="TOP">
+                        <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">
+                            <TR><TD COLSPAN="2" BGCOLOR="#2F5F86" ALIGN="CENTER" CELLPADDING="10"><FONT COLOR="#FFFFFF" FACE="Arial" POINT-SIZE="18"><B>Teste α</B></FONT></TD></TR>
+                            <TR><TD BGCOLOR="#B5E4C8" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">pedido = Pedido()</FONT></TD><TD BGCOLOR="#B5E4C8" ALIGN="RIGHT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">A</FONT></TD></TR>
+                            <TR><TD BGCOLOR="#B5E4C8" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">pedido.adicionar(livro)</FONT></TD><TD BGCOLOR="#B5E4C8" ALIGN="RIGHT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">B</FONT></TD></TR>
+                            <TR><TD BGCOLOR="#E8BD4F" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">pedido.aplicarDesconto(10)</FONT></TD><TD BGCOLOR="#E8BD4F" ALIGN="RIGHT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">C</FONT></TD></TR>
+                            <TR><TD BGCOLOR="#7EB8DA" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">pedido.confirmar()</FONT></TD><TD BGCOLOR="#7EB8DA" ALIGN="RIGHT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">D</FONT></TD></TR>
+                            <TR><TD BGCOLOR="#E8E8E8" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">assertEquals(90, total())</FONT></TD><TD BGCOLOR="#E8E8E8" ALIGN="RIGHT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">E</FONT></TD></TR>
+                        </TABLE>
+                    </TD>
+                    <TD VALIGN="TOP">
+                        <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">
+                            <TR><TD COLSPAN="2" BGCOLOR="#2F5F86" ALIGN="CENTER" CELLPADDING="10"><FONT COLOR="#FFFFFF" FACE="Arial" POINT-SIZE="18"><B>Teste β</B></FONT></TD></TR>
+                            <TR><TD BGCOLOR="#B5E4C8" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">pedido = Pedido()</FONT></TD><TD BGCOLOR="#B5E4C8" ALIGN="RIGHT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">A</FONT></TD></TR>
+                            <TR><TD BGCOLOR="#B5E4C8" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">pedido.adicionar(livro)</FONT></TD><TD BGCOLOR="#B5E4C8" ALIGN="RIGHT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">B</FONT></TD></TR>
+                            <TR><TD BGCOLOR="#E8BD4F" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">pedido.adicionar(caneta)</FONT></TD><TD BGCOLOR="#E8BD4F" ALIGN="RIGHT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">X</FONT></TD></TR>
+                            <TR><TD BGCOLOR="#7EB8DA" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">pedido.confirmar()</FONT></TD><TD BGCOLOR="#7EB8DA" ALIGN="RIGHT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">D</FONT></TD></TR>
+                            <TR><TD BGCOLOR="#E8E8E8" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">assertEquals(120, total())</FONT></TD><TD BGCOLOR="#E8E8E8" ALIGN="RIGHT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">Y</FONT></TD></TR>
+                        </TABLE>
+                    </TD>
+                    <TD VALIGN="TOP">
+                        <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="0">
+                            <TR>
+                                <TD>
+                                    <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">
+                                        <TR><TD BGCOLOR="#2F5F86" ALIGN="CENTER" CELLPADDING="10"><FONT COLOR="#FFFFFF" FACE="Arial" POINT-SIZE="18"><B>Legenda</B></FONT></TD></TR>
+                                        <TR><TD BGCOLOR="#B5E4C8" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Arial" POINT-SIZE="16">prefixo comum</FONT></TD></TR>
+                                        <TR><TD BGCOLOR="#E8BD4F" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Arial" POINT-SIZE="16">comandos diferentes</FONT></TD></TR>
+                                        <TR><TD BGCOLOR="#7EB8DA" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Arial" POINT-SIZE="16">comum após divergência</FONT></TD></TR>
+                                    </TABLE>
+                                </TD>
+                            </TR>
+                            <TR><TD HEIGHT="70"></TD></TR>
+                        </TABLE>
+                    </TD>
+                </TR>
+            </TABLE>
+        >
+    ];
+    node [
+        shape=plain,
+        fontname="Arial",
+        fontsize=16
+    ];
+    edge [
+        color="#566572",
+        penwidth=1.7,
+        arrowsize=0.75
+    ];
 
-	sequences [label=<
-		<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="6" CELLPADDING="10">
-			<TR>
-				<TD BORDER="0" ALIGN="RIGHT"><B>α</B></TD>
-				<TD BGCOLOR="#D9EAD3">A</TD>
-				<TD BGCOLOR="#D9EAD3">B</TD>
-				<TD BGCOLOR="#F2F2F2">C</TD>
-				<TD BGCOLOR="#FFF2CC">D</TD>
-			</TR>
-			<TR>
-				<TD BORDER="0" ALIGN="RIGHT"><B>β</B></TD>
-				<TD BGCOLOR="#D9EAD3">A</TD>
-				<TD BGCOLOR="#D9EAD3">B</TD>
-				<TD BGCOLOR="#F2F2F2">X</TD>
-				<TD BGCOLOR="#FFF2CC">D</TD>
-			</TR>
-		</TABLE>
-	>];
+    lcs [group=lcs_spine, label=<
+        <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">
+            <TR><TD BGCOLOR="#2F5F86" ALIGN="CENTER" CELLPADDING="10"><FONT COLOR="#FFFFFF" FACE="Arial" POINT-SIZE="18"><B>LCS(α, β)</B></FONT></TD></TR>
+            <TR><TD BGCOLOR="#E8E8E8" ALIGN="CENTER" CELLPADDING="10"><FONT FACE="Courier New" POINT-SIZE="16">⟨A, B, D⟩</FONT> <FONT FACE="Arial" POINT-SIZE="16">δ = 0,60</FONT></TD></TR>
+        </TABLE>
+    >];
 
-	lcs [label=<
-		<TABLE BORDER="1" COLOR="#D6B656" CELLBORDER="0" CELLSPACING="0" CELLPADDING="10">
-			<TR><TD BGCOLOR="#FFF2CC"><B>LCS(α, β) = ⟨A, B, D⟩</B></TD></TR>
-			<TR><TD ALIGN="LEFT">3 comandos comuns; δ(α, β) = 0,75</TD></TR>
-			<TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">D é considerado mesmo após a divergência.</FONT></TD></TR>
-		</TABLE>
-	>];
+    lccss [group=lccss_spine, label=<
+        <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">
+            <TR><TD BGCOLOR="#2F5F86" ALIGN="CENTER" CELLPADDING="10"><FONT COLOR="#FFFFFF" FACE="Arial" POINT-SIZE="18"><B>LCCSS(α, β)</B></FONT></TD></TR>
+            <TR><TD BGCOLOR="#E8E8E8" ALIGN="CENTER" CELLPADDING="10"><FONT FACE="Courier New" POINT-SIZE="16">⟨A, B⟩</FONT> <FONT FACE="Arial" POINT-SIZE="16">δ = 0,40</FONT></TD></TR>
+        </TABLE>
+    >];
 
-	lccss [label=<
-		<TABLE BORDER="1" COLOR="#82B366" CELLBORDER="0" CELLSPACING="0" CELLPADDING="10">
-			<TR><TD BGCOLOR="#D9EAD3"><B>LCCSS(α, β) = ⟨A, B⟩</B></TD></TR>
-			<TR><TD ALIGN="LEFT">2 comandos no prefixo comum; δ(α, β) = 0,50</TD></TR>
-			<TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">A comparação termina na primeira divergência.</FONT></TD></TR>
-		</TABLE>
-	>];
+    setup_lcs [group=lcs_spine, label=<
+        <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">
+            <TR><TD COLSPAN="2" BGCOLOR="#2F5F86" ALIGN="CENTER" CELLPADDING="8"><FONT COLOR="#FFFFFF" FACE="Arial" POINT-SIZE="16"><B>Configuração extraída pela LCS</B></FONT></TD></TR>
+            <TR><TD COLSPAN="2" BGCOLOR="#E8E8E8" ALIGN="LEFT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">@BeforeEach configurar()</FONT></TD></TR>
+            <TR><TD BGCOLOR="#B5E4C8" ALIGN="LEFT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">pedido = Pedido()</FONT></TD><TD BGCOLOR="#B5E4C8" ALIGN="RIGHT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">A</FONT></TD></TR>
+            <TR><TD BGCOLOR="#B5E4C8" ALIGN="LEFT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">pedido.adicionar(livro)</FONT></TD><TD BGCOLOR="#B5E4C8" ALIGN="RIGHT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">B</FONT></TD></TR>
+            <TR><TD BGCOLOR="#7EB8DA" ALIGN="LEFT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">pedido.confirmar()</FONT></TD><TD BGCOLOR="#7EB8DA" ALIGN="RIGHT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">D</FONT></TD></TR>
+        </TABLE>
+    >];
 
-	legend [label=<
-		<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="5" CELLPADDING="6">
-			<TR>
-				<TD BGCOLOR="#D9EAD3">prefixo comum (LCS e LCCSS)</TD>
-				<TD BGCOLOR="#FFF2CC">comum apenas para a LCS</TD>
-				<TD BGCOLOR="#F2F2F2">divergência</TD>
-			</TR>
-		</TABLE>
-	>];
+    setup_lccss [group=lccss_spine, label=<
+        <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">
+            <TR><TD COLSPAN="2" BGCOLOR="#2F5F86" ALIGN="CENTER" CELLPADDING="8"><FONT COLOR="#FFFFFF" FACE="Arial" POINT-SIZE="16"><B>Configuração extraída pela LCCSS</B></FONT></TD></TR>
+            <TR><TD COLSPAN="2" BGCOLOR="#E8E8E8" ALIGN="LEFT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">@BeforeEach configurar()</FONT></TD></TR>
+            <TR><TD BGCOLOR="#B5E4C8" ALIGN="LEFT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">pedido = Pedido()</FONT></TD><TD BGCOLOR="#B5E4C8" ALIGN="RIGHT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">A</FONT></TD></TR>
+            <TR><TD BGCOLOR="#B5E4C8" ALIGN="LEFT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">pedido.adicionar(livro)</FONT></TD><TD BGCOLOR="#B5E4C8" ALIGN="RIGHT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">B</FONT></TD></TR>
+        </TABLE>
+    >];
 
-	sequences -> lcs;
-	sequences -> lccss;
-	{ rank=same; lcs; lccss; }
-	lcs -> legend [style=invis];
-	lccss -> legend [style=invis];
+    lcs_alpha [group=lcs_left, label=<
+        <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">
+            <TR><TD COLSPAN="2" BGCOLOR="#2F5F86" ALIGN="CENTER" CELLPADDING="8"><FONT COLOR="#FFFFFF" FACE="Arial" POINT-SIZE="16"><B>Teste α após LCS</B></FONT></TD></TR>
+            <TR><TD BGCOLOR="#E8BD4F" ALIGN="LEFT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">pedido.aplicarDesconto(10)</FONT></TD><TD BGCOLOR="#E8BD4F" ALIGN="RIGHT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">C</FONT></TD></TR>
+            <TR><TD BGCOLOR="#E8E8E8" ALIGN="LEFT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">assertEquals(90, total())</FONT></TD><TD BGCOLOR="#E8E8E8" ALIGN="RIGHT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">E</FONT></TD></TR>
+        </TABLE>
+    >];
+
+    lcs_beta [group=lcs_spine, label=<
+        <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">
+            <TR><TD COLSPAN="2" BGCOLOR="#2F5F86" ALIGN="CENTER" CELLPADDING="8"><FONT COLOR="#FFFFFF" FACE="Arial" POINT-SIZE="16"><B>Teste β após LCS</B></FONT></TD></TR>
+            <TR><TD BGCOLOR="#E8BD4F" ALIGN="LEFT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">pedido.adicionar(caneta)</FONT></TD><TD BGCOLOR="#E8BD4F" ALIGN="RIGHT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">X</FONT></TD></TR>
+            <TR><TD BGCOLOR="#E8E8E8" ALIGN="LEFT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">assertEquals(120, total())</FONT></TD><TD BGCOLOR="#E8E8E8" ALIGN="RIGHT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">Y</FONT></TD></TR>
+        </TABLE>
+    >];
+
+    lccss_alpha [group=lccss_left, label=<
+        <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">
+            <TR><TD COLSPAN="2" BGCOLOR="#2F5F86" ALIGN="CENTER" CELLPADDING="8"><FONT COLOR="#FFFFFF" FACE="Arial" POINT-SIZE="16"><B>Teste α após LCCSS</B></FONT></TD></TR>
+            <TR><TD BGCOLOR="#E8BD4F" ALIGN="LEFT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">pedido.aplicarDesconto(10)</FONT></TD><TD BGCOLOR="#E8BD4F" ALIGN="RIGHT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">C</FONT></TD></TR>
+            <TR><TD BGCOLOR="#7EB8DA" ALIGN="LEFT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">pedido.confirmar()</FONT></TD><TD BGCOLOR="#7EB8DA" ALIGN="RIGHT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">D</FONT></TD></TR>
+            <TR><TD BGCOLOR="#E8E8E8" ALIGN="LEFT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">assertEquals(90, total())</FONT></TD><TD BGCOLOR="#E8E8E8" ALIGN="RIGHT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">E</FONT></TD></TR>
+        </TABLE>
+    >];
+
+    lccss_beta [group=lccss_spine, label=<
+        <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">
+            <TR><TD COLSPAN="2" BGCOLOR="#2F5F86" ALIGN="CENTER" CELLPADDING="8"><FONT COLOR="#FFFFFF" FACE="Arial" POINT-SIZE="16"><B>Teste β após LCCSS</B></FONT></TD></TR>
+            <TR><TD BGCOLOR="#E8BD4F" ALIGN="LEFT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">pedido.adicionar(caneta)</FONT></TD><TD BGCOLOR="#E8BD4F" ALIGN="RIGHT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">X</FONT></TD></TR>
+            <TR><TD BGCOLOR="#7EB8DA" ALIGN="LEFT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">pedido.confirmar()</FONT></TD><TD BGCOLOR="#7EB8DA" ALIGN="RIGHT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">D</FONT></TD></TR>
+            <TR><TD BGCOLOR="#E8E8E8" ALIGN="LEFT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">assertEquals(120, total())</FONT></TD><TD BGCOLOR="#E8E8E8" ALIGN="RIGHT" CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">Y</FONT></TD></TR>
+        </TABLE>
+    >];
+
+    lcs_alpha_fail [group=lcs_left, label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" COLOR="#702F29">
+            <TR><TD BGCOLOR="#D7806C" ALIGN="CENTER" CELLPADDING="7"><FONT FACE="Arial" POINT-SIZE="16"><B>Teste α falha</B></FONT></TD></TR>
+            <TR><TD BGCOLOR="#F1B5A6" ALIGN="CENTER" CELLPADDING="7"><FONT FACE="Arial" POINT-SIZE="14">Desconto aplicado<BR/>após a confirmação.</FONT></TD></TR>
+        </TABLE>
+    >];
+
+    lcs_beta_fail [group=lcs_spine, label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" COLOR="#702F29">
+            <TR><TD BGCOLOR="#D7806C" ALIGN="CENTER" CELLPADDING="7"><FONT FACE="Arial" POINT-SIZE="16"><B>Teste β falha</B></FONT></TD></TR>
+            <TR><TD BGCOLOR="#F1B5A6" ALIGN="CENTER" CELLPADDING="7"><FONT FACE="Arial" POINT-SIZE="14">Item adicionado<BR/>após a confirmação.</FONT></TD></TR>
+        </TABLE>
+    >];
+
+    lccss_alpha_pass [group=lccss_left, label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" COLOR="#4F7652">
+            <TR><TD BGCOLOR="#85B989" ALIGN="CENTER" CELLPADDING="7"><FONT FACE="Arial" POINT-SIZE="16"><B>Teste α passa</B></FONT></TD></TR>
+            <TR><TD BGCOLOR="#D6EBD8" ALIGN="CENTER" CELLPADDING="7"><FONT FACE="Arial" POINT-SIZE="14">Desconto aplicado<BR/>antes da confirmação.</FONT></TD></TR>
+        </TABLE>
+    >];
+
+    lccss_beta_pass [group=lccss_spine, label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" COLOR="#4F7652">
+            <TR><TD BGCOLOR="#85B989" ALIGN="CENTER" CELLPADDING="7"><FONT FACE="Arial" POINT-SIZE="16"><B>Teste β passa</B></FONT></TD></TR>
+            <TR><TD BGCOLOR="#D6EBD8" ALIGN="CENTER" CELLPADDING="7"><FONT FACE="Arial" POINT-SIZE="14">Item adicionado<BR/>antes da confirmação.</FONT></TD></TR>
+        </TABLE>
+    >];
+
+    lcs_pad [
+        group=lcs_left,
+        shape=plain,
+        style=invis,
+        label=<
+            <TABLE BORDER="0" CELLSPACING="0" CELLPADDING="0">
+                <TR><TD CELLPADDING="8"><FONT FACE="Arial" POINT-SIZE="16">Teste α após LCS</FONT></TD></TR>
+                <TR><TD CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">pedido.aplicarDesconto(10)</FONT></TD></TR>
+                <TR><TD CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">assertEquals(90, total())</FONT></TD></TR>
+            </TABLE>
+        >
+    ];
+    setup_lcs_pad [
+        group=lcs_left,
+        shape=plain,
+        style=invis,
+        label=<
+            <TABLE BORDER="0" CELLSPACING="0" CELLPADDING="0">
+                <TR><TD CELLPADDING="8"><FONT FACE="Arial" POINT-SIZE="16">Teste α após LCS</FONT></TD></TR>
+                <TR><TD CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">pedido.aplicarDesconto(10)</FONT></TD></TR>
+                <TR><TD CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">assertEquals(90, total())</FONT></TD></TR>
+            </TABLE>
+        >
+    ];
+    lccss_pad [
+        group=lccss_left,
+        shape=plain,
+        style=invis,
+        label=<
+            <TABLE BORDER="0" CELLSPACING="0" CELLPADDING="0">
+                <TR><TD CELLPADDING="8"><FONT FACE="Arial" POINT-SIZE="16">Teste α após LCCSS</FONT></TD></TR>
+                <TR><TD CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">pedido.aplicarDesconto(10)</FONT></TD></TR>
+                <TR><TD CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">pedido.confirmar()</FONT></TD></TR>
+                <TR><TD CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">assertEquals(90, total())</FONT></TD></TR>
+            </TABLE>
+        >
+    ];
+    setup_lccss_pad [
+        group=lccss_left,
+        shape=plain,
+        style=invis,
+        label=<
+            <TABLE BORDER="0" CELLSPACING="0" CELLPADDING="0">
+                <TR><TD CELLPADDING="8"><FONT FACE="Arial" POINT-SIZE="16">Teste α após LCCSS</FONT></TD></TR>
+                <TR><TD CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">pedido.aplicarDesconto(10)</FONT></TD></TR>
+                <TR><TD CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">pedido.confirmar()</FONT></TD></TR>
+                <TR><TD CELLPADDING="6"><FONT FACE="Courier New" POINT-SIZE="14">assertEquals(90, total())</FONT></TD></TR>
+            </TABLE>
+        >
+    ];
+
+    gap1 [style=invis, shape=box, width=0.05, height=0.1, label=""];
+    gap2 [style=invis, shape=box, width=0.05, height=0.1, label=""];
+    gap3 [style=invis, shape=box, width=0.05, height=0.1, label=""];
+    gap4 [style=invis, shape=box, width=0.05, height=0.1, label=""];
+
+    { rank=same; lcs_pad; lcs; gap1; lccss_pad; lccss; }
+    { rank=same; setup_lcs_pad; setup_lcs; gap2; setup_lccss_pad; setup_lccss; }
+    { rank=same; lcs_alpha; lcs_beta; gap3; lccss_alpha; lccss_beta; }
+    { rank=same; lcs_alpha_fail; lcs_beta_fail; gap4; lccss_alpha_pass; lccss_beta_pass; }
+
+    lcs_pad -> lcs [style=invis, weight=40];
+    lcs -> gap1 -> lccss_pad [style=invis, weight=10];
+    lccss_pad -> lccss [style=invis, weight=40];
+
+    setup_lcs_pad -> setup_lcs [style=invis, weight=40];
+    setup_lcs -> gap2 -> setup_lccss_pad [style=invis, weight=10];
+    setup_lccss_pad -> setup_lccss [style=invis, weight=40];
+
+    lcs_alpha -> lcs_beta [style=invis, weight=40];
+    lcs_beta -> gap3 -> lccss_alpha [style=invis, weight=10];
+    lccss_alpha -> lccss_beta [style=invis, weight=40];
+
+    lcs_alpha_fail -> lcs_beta_fail [style=invis, weight=40];
+    lcs_beta_fail -> gap4 -> lccss_alpha_pass [style=invis, weight=10];
+    lccss_alpha_pass -> lccss_beta_pass [style=invis, weight=40];
+
+    lcs_pad -> setup_lcs_pad -> lcs_alpha [style=invis, weight=100];
+    lccss_pad -> setup_lccss_pad -> lccss_alpha [style=invis, weight=100];
+
+    lcs -> setup_lcs [weight=100];
+    setup_lcs -> lcs_beta [weight=100];
+    lcs_beta -> lcs_beta_fail [weight=100];
+    lcs_alpha -> lcs_alpha_fail [weight=100];
+
+    lccss -> setup_lccss [weight=100];
+    setup_lccss -> lccss_beta [weight=100];
+    lccss_beta -> lccss_beta_pass [weight=100];
+    lccss_alpha -> lccss_alpha_pass [weight=100];
+
+    setup_lcs -> lcs_alpha [constraint=false];
+    setup_lccss -> lccss_alpha [constraint=false];
 }
