@@ -1,0 +1,61 @@
+digraph LccssLcsComparison {
+	graph [
+		bgcolor="white",
+		fontname="Helvetica",
+		nodesep=0.45,
+		ranksep=0.55
+	];
+	node [fontname="Helvetica", shape=plain];
+	edge [color="#666666", fontname="Helvetica"];
+
+	sequences [label=<
+		<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="6" CELLPADDING="10">
+			<TR>
+				<TD BORDER="0" ALIGN="RIGHT"><B>α</B></TD>
+				<TD BGCOLOR="#D9EAD3">A</TD>
+				<TD BGCOLOR="#D9EAD3">B</TD>
+				<TD BGCOLOR="#F2F2F2">C</TD>
+				<TD BGCOLOR="#FFF2CC">D</TD>
+			</TR>
+			<TR>
+				<TD BORDER="0" ALIGN="RIGHT"><B>β</B></TD>
+				<TD BGCOLOR="#D9EAD3">A</TD>
+				<TD BGCOLOR="#D9EAD3">B</TD>
+				<TD BGCOLOR="#F2F2F2">X</TD>
+				<TD BGCOLOR="#FFF2CC">D</TD>
+			</TR>
+		</TABLE>
+	>];
+
+	lcs [label=<
+		<TABLE BORDER="1" COLOR="#D6B656" CELLBORDER="0" CELLSPACING="0" CELLPADDING="10">
+			<TR><TD BGCOLOR="#FFF2CC"><B>LCS(α, β) = ⟨A, B, D⟩</B></TD></TR>
+			<TR><TD ALIGN="LEFT">3 comandos comuns; δ(α, β) = 0,75</TD></TR>
+			<TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">D é considerado mesmo após a divergência.</FONT></TD></TR>
+		</TABLE>
+	>];
+
+	lccss [label=<
+		<TABLE BORDER="1" COLOR="#82B366" CELLBORDER="0" CELLSPACING="0" CELLPADDING="10">
+			<TR><TD BGCOLOR="#D9EAD3"><B>LCCSS(α, β) = ⟨A, B⟩</B></TD></TR>
+			<TR><TD ALIGN="LEFT">2 comandos no prefixo comum; δ(α, β) = 0,50</TD></TR>
+			<TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">A comparação termina na primeira divergência.</FONT></TD></TR>
+		</TABLE>
+	>];
+
+	legend [label=<
+		<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="5" CELLPADDING="6">
+			<TR>
+				<TD BGCOLOR="#D9EAD3">prefixo comum (LCS e LCCSS)</TD>
+				<TD BGCOLOR="#FFF2CC">comum apenas para a LCS</TD>
+				<TD BGCOLOR="#F2F2F2">divergência</TD>
+			</TR>
+		</TABLE>
+	>];
+
+	sequences -> lcs;
+	sequences -> lccss;
+	{ rank=same; lcs; lccss; }
+	lcs -> legend [style=invis];
+	lccss -> legend [style=invis];
+}

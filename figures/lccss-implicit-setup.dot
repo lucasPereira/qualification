@@ -1,0 +1,68 @@
+digraph LccssImplicitSetup {
+	graph [
+		bgcolor="white",
+		fontname="Helvetica",
+		nodesep=0.55,
+		rankdir=LR,
+		ranksep=0.8
+	];
+	node [fontname="Helvetica", shape=plain];
+	edge [color="#666666", fontname="Helvetica", penwidth=1.5];
+
+	before [label=<
+		<TABLE BORDER="1" COLOR="#999999" CELLBORDER="0" CELLSPACING="0" CELLPADDING="9">
+			<TR><TD BGCOLOR="#EAF2F8" COLSPAN="5"><B>Antes da refatoração</B></TD></TR>
+			<TR>
+				<TD ALIGN="RIGHT"><B>Teste α</B></TD>
+				<TD BGCOLOR="#D9EAD3">A</TD>
+				<TD BGCOLOR="#D9EAD3">B</TD>
+				<TD BGCOLOR="#F2F2F2">C</TD>
+				<TD BGCOLOR="#FFF2CC">D</TD>
+			</TR>
+			<TR>
+				<TD ALIGN="RIGHT"><B>Teste β</B></TD>
+				<TD BGCOLOR="#D9EAD3">A</TD>
+				<TD BGCOLOR="#D9EAD3">B</TD>
+				<TD BGCOLOR="#F2F2F2">X</TD>
+				<TD BGCOLOR="#FFF2CC">D</TD>
+			</TR>
+		</TABLE>
+	>];
+
+	after [label=<
+		<TABLE BORDER="1" COLOR="#999999" CELLBORDER="0" CELLSPACING="0" CELLPADDING="9">
+			<TR><TD BGCOLOR="#EAF2F8" COLSPAN="5"><B>Após a refatoração</B></TD></TR>
+			<TR>
+				<TD ALIGN="RIGHT"><B>Configuração implícita</B></TD>
+				<TD BGCOLOR="#D9EAD3">A</TD>
+				<TD BGCOLOR="#D9EAD3">B</TD>
+				<TD BORDER="0"></TD>
+				<TD BORDER="0"></TD>
+			</TR>
+			<TR>
+				<TD ALIGN="RIGHT"><B>Teste α</B></TD>
+				<TD BGCOLOR="#F2F2F2">C</TD>
+				<TD BGCOLOR="#FFF2CC">D</TD>
+				<TD BORDER="0"></TD>
+				<TD BORDER="0"></TD>
+			</TR>
+			<TR>
+				<TD ALIGN="RIGHT"><B>Teste β</B></TD>
+				<TD BGCOLOR="#F2F2F2">X</TD>
+				<TD BGCOLOR="#FFF2CC">D</TD>
+				<TD BORDER="0"></TD>
+				<TD BORDER="0"></TD>
+			</TR>
+		</TABLE>
+	>];
+
+	note [label=<
+		<TABLE BORDER="0" CELLBORDER="0" CELLPADDING="4">
+			<TR><TD><FONT POINT-SIZE="10">A e B formam o prefixo extraível.</FONT></TD></TR>
+			<TR><TD><FONT POINT-SIZE="10">D permanece nos testes porque ocorre após C e X.</FONT></TD></TR>
+		</TABLE>
+	>];
+
+	before -> after [label="extrair LCCSS(α, β)"];
+	after -> note [style=invis];
+}
