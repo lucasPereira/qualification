@@ -4,9 +4,8 @@
 Este apêndice detalha as violações mencionadas no \autoref{chapter:proposal}. Cada subseção apresenta a condição que caracteriza uma violação, o motivo de sua adoção e um exemplo.
 
 \section{Violações de classe}
-\label{appendix:class-violations}
 
-Uma violação de classe é registrada quando o elemento identificado afeta a classe como um todo, o arquivo que a declara ou algum elemento compartilhado por seus testes. Nesse caso, todos os métodos de teste da classe são excluídos das etapas seguintes do pipeline.
+Uma violação de classe é registrada quando o elemento identificado afeta a classe como um todo, o arquivo que a declara ou algum elemento compartilhado por seus testes. Nesse caso, todos os métodos de teste da classe são excluídos das etapas seguintes do \textit{pipeline}.
 
 \subsection{Importação com curinga}
 
@@ -150,7 +149,7 @@ static Banco banco;
 
 \subsection{Atributo anotado}
 
-Ocorre quando um atributo possui uma anotação. Essa violação foi adotada porque frameworks e extensões podem usar a anotação para criar, substituir ou destruir o valor do atributo fora do método de configuração implícita. No trecho, \texttt{@TempDir} solicita ao JUnit que forneça um diretório temporário antes do teste. Mover o atributo ou o método sem compreender essa anotação pode eliminar a injeção ou alterar seu ciclo de vida. Como o Róża não interpreta anotações de atributos, recusa o caso para evitar a quebra dos testes refatorados.
+Ocorre quando um atributo possui uma anotação. Essa violação foi adotada porque \textit{frameworks} e extensões podem usar a anotação para criar, substituir ou destruir o valor do atributo fora do método de configuração implícita. No trecho, \texttt{@TempDir} solicita ao JUnit que forneça um diretório temporário antes do teste. Mover o atributo ou o método sem compreender essa anotação pode eliminar a injeção ou alterar seu ciclo de vida. Como o Róża não interpreta anotações de atributos, recusa o caso para evitar a quebra dos testes refatorados.
 
 \begin{violationexample}
 @TempDir Path pasta;
@@ -202,13 +201,12 @@ Ocorre quando o método de configuração implícita é estático, possui parâm
 \end{violationexample}
 
 \section{Violações de método}
-\label{appendix:method-violations}
 
-As violações desta seção aplicam-se a um método de teste. O analisador exclui apenas o método afetado, de modo que os demais testes da classe possam seguir no pipeline. Quando a mesma construção ocorre no método de configuração implícita, o analisador registra uma violação de classe, pois a extração da configuração compartilhada ficaria comprometida para todos os testes.
+As violações desta seção aplicam-se a um método de teste. O analisador exclui apenas o método afetado, de modo que os demais testes da classe possam seguir no \textit{pipeline}. Quando a mesma construção ocorre no método de configuração implícita, o analisador registra uma violação de classe, pois a extração da configuração compartilhada ficaria comprometida para todos os testes.
 
 \subsection{Teste parametrizado ou com ciclo de vida distinto}
 
-Ocorre quando o método é parametrizado, repetido, teórico, gerado por fábrica ou definido por um modelo. São registradas as anotações \texttt{@ParameterizedTest}, \texttt{@RepeatedTest}, \texttt{@Theory}, \texttt{@TestFactory} e \texttt{@TestTemplate}. O suporte foi excluído para simplificar o Róża, cujo modelo representa cada método como um único teste sem parâmetros. No trecho, \texttt{aceita} é executado uma vez para cada valor fornecido. Tratar esse caso exigiria representar as invocações produzidas pelo framework e preservar suas fontes, nomes e ciclos de vida. Mover o método como se fosse um teste simples poderia eliminar essas invocações ou mudar os valores recebidos e, portanto, quebrar o teste refatorado.
+Ocorre quando o método é parametrizado, repetido, teórico, gerado por fábrica ou definido por um modelo. São registradas as anotações \texttt{@ParameterizedTest}, \texttt{@RepeatedTest}, \texttt{@Theory}, \texttt{@TestFactory} e \texttt{@TestTemplate}. O suporte foi excluído para simplificar o Róża, cujo modelo representa cada método como um único teste sem parâmetros. No trecho, \texttt{aceita} é executado uma vez para cada valor fornecido. Tratar esse caso exigiria representar as invocações produzidas pelo \textit{framework} e preservar suas fontes, nomes e ciclos de vida. Mover o método como se fosse um teste simples poderia eliminar essas invocações ou mudar os valores recebidos e, portanto, quebrar o teste refatorado.
 
 \begin{violationexample}
 @ParameterizedTest
@@ -247,7 +245,7 @@ public void abre() { banco.abrir(); }
 
 \subsection{Método de teste fora do contrato}
 
-Ocorre quando o método de teste é privado, estático, sem corpo, possui parâmetros ou tem tipo de retorno distinto de \texttt{void}. Essas formas ficam fora do contrato simplificado do Róża, que representa testes como métodos de instância, com corpo, sem parâmetros e sem retorno. Algumas delas não constituem testes válidos na versão correspondente do JUnit; outras dependem de extensões que fornecem parâmetros ou alteram a execução. No trecho, \texttt{private} impede que o método seja descoberto como um teste convencional. Como o comportamento esperado não está definido pelo modelo adotado, não há uma redistribuição com significado sem interpretar as regras adicionais do framework.
+Ocorre quando o método de teste é privado, estático, sem corpo, possui parâmetros ou tem tipo de retorno distinto de \texttt{void}. Essas formas ficam fora do contrato simplificado do Róża, que representa testes como métodos de instância, com corpo, sem parâmetros e sem retorno. Algumas delas não constituem testes válidos na versão correspondente do JUnit; outras dependem de extensões que fornecem parâmetros ou alteram a execução. No trecho, \texttt{private} impede que o método seja descoberto como um teste convencional. Como o comportamento esperado não está definido pelo modelo adotado, não há uma redistribuição com significado sem interpretar as regras adicionais do \textit{framework}.
 
 \begin{violationexample}
 @Test private void abre() {}

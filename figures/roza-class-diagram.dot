@@ -2,6 +2,8 @@ digraph RozaClassDiagram {
   graph [
     bgcolor="white",
     rankdir=TB,
+    compound=true,
+    newrank=true,
     splines=true,
     nodesep="0.45",
     ranksep="0.55",
@@ -61,6 +63,15 @@ digraph RozaClassDiagram {
           <TR><TD ALIGN="LEFT">− source: String<BR ALIGN="LEFT"/>− content: String</TD></TR>
         </TABLE>
       >
+    ];
+
+    LoadingSpacer [
+      shape=box,
+      style=invis,
+      fixedsize=true,
+      width=2.26,
+      height=1.33,
+      label=""
     ];
   }
 
@@ -149,6 +160,15 @@ digraph RozaClassDiagram {
         </TABLE>
       >
     ];
+
+    DecompositionSpacer [
+      shape=box,
+      style=invis,
+      fixedsize=true,
+      width=2.26,
+      height=1.33,
+      label=""
+    ];
   }
 
   subgraph cluster_measurement {
@@ -179,10 +199,59 @@ digraph RozaClassDiagram {
         </TABLE>
       >
     ];
+
+    MeasurementSpacerLeft [
+      shape=box,
+      style=invis,
+      fixedsize=true,
+      width=2.98,
+      height=1.33,
+      label=""
+    ];
+
+    MeasurementSpacerRight [
+      shape=box,
+      style=invis,
+      fixedsize=true,
+      width=2.26,
+      height=1.33,
+      label=""
+    ];
   }
+
+  loading_top [shape=point, width=0.01, height=0.01, style=invis, label=""];
+  parsing_top [shape=point, width=0.01, height=0.01, style=invis, label=""];
+  decomposition_top [shape=point, width=0.01, height=0.01, style=invis, label=""];
+  measurement_top [shape=point, width=0.01, height=0.01, style=invis, label=""];
+
+  loading_bottom [shape=point, width=0.01, height=0.01, style=invis, label=""];
+  parsing_bottom [shape=point, width=0.01, height=0.01, style=invis, label=""];
+  decomposition_bottom [shape=point, width=0.01, height=0.01, style=invis, label=""];
+  measurement_bottom [shape=point, width=0.01, height=0.01, style=invis, label=""];
+
+  { rank=min; loading_top; parsing_top; decomposition_top; measurement_top; }
+  { rank=same; CodeFileLoader; TestClassParser; TestCaseDecomposer; TestCaseSimilarityMeasurer; }
+  { rank=same; LoadedCodeFiles; ParsedTestClasses; DecomposedTestCases; TestCaseSimilarityMatrix; }
+  { rank=same; CodeFile; TestClass; TestCodeViolation; TestCase; LoadingSpacer; DecompositionSpacer; MeasurementSpacerLeft; MeasurementSpacerRight; }
+  { rank=max; loading_bottom; parsing_bottom; decomposition_bottom; measurement_bottom; }
+
+  loading_top -> CodeFileLoader [style=invis, weight=0];
+  parsing_top -> TestClassParser [style=invis, weight=0];
+  decomposition_top -> TestCaseDecomposer [style=invis, weight=0];
+  measurement_top -> TestCaseSimilarityMeasurer [style=invis, weight=0];
+
+  CodeFile -> loading_bottom [style=invis, weight=0];
+  LoadingSpacer -> loading_bottom [style=invis, weight=0];
+  TestClass -> parsing_bottom [style=invis, weight=0];
+  TestCodeViolation -> parsing_bottom [style=invis, weight=0];
+  TestCase -> decomposition_bottom [style=invis, weight=0];
+  DecompositionSpacer -> decomposition_bottom [style=invis, weight=0];
+  MeasurementSpacerLeft -> measurement_bottom [style=invis, weight=0];
+  MeasurementSpacerRight -> measurement_bottom [style=invis, weight=0];
 
   CodeFileLoader -> LoadedCodeFiles [style=dashed, arrowhead=vee];
   LoadedCodeFiles -> CodeFile [dir=both, arrowhead=none, arrowtail=diamond, taillabel="1", headlabel="0..*"];
+  CodeFile -> LoadingSpacer [style=invis, weight=0];
 
   TestClassParser -> LoadedCodeFiles [style=dashed, arrowhead=vee];
   TestClassParser -> ParsedTestClasses [style=dashed, arrowhead=vee];
@@ -192,8 +261,11 @@ digraph RozaClassDiagram {
   TestCaseDecomposer -> ParsedTestClasses [style=dashed, arrowhead=vee];
   TestCaseDecomposer -> DecomposedTestCases [style=dashed, arrowhead=vee];
   DecomposedTestCases -> TestCase [dir=both, arrowhead=none, arrowtail=diamond, taillabel="1", headlabel="0..*"];
+  TestCase -> DecompositionSpacer [style=invis, weight=0];
 
   TestCaseSimilarityMeasurer -> DecomposedTestCases [style=dashed, arrowhead=vee];
   TestCaseSimilarityMeasurer -> TestCaseSimilarityMatrix [style=dashed, arrowhead=vee];
   TestCaseSimilarityMatrix -> TestCase [style=dashed, arrowhead=vee];
+  TestCaseSimilarityMatrix -> MeasurementSpacerLeft [style=invis, weight=10];
+  TestCaseSimilarityMatrix -> MeasurementSpacerRight [style=invis, weight=10];
 }

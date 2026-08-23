@@ -7,16 +7,16 @@ O objetivo deste trabalho consiste em reduzir essa duplicação agrupando, em um
 
 Essa distribuição não é tratada como uma sucessão de decisões locais, nas quais se escolhe isoladamente uma classe para cada novo teste. A movimentação de um teste pode alterar tanto o código reusável quanto a duplicação introduzida nos demais testes da classe. Por isso, este trabalho aborda a distribuição dos testes como um problema de otimização global sobre toda a suíte: busca-se uma organização em classes que reduza a duplicação total ao aumentar o reuso das sequências iniciais de configuração de acessórios, preservando o comportamento observado dos testes. A refatoração pode ser aplicada em qualquer momento da evolução da suíte. Assim, quando novos testes forem adicionados, o processo pode ser executado novamente para recalcular a distribuição global e incorporá-los à organização das classes.
 
-Para operacionalizar essa abordagem, o trabalho contribui com (1) uma arquitetura em pipeline para refatoração de código de teste; e (2) o Róża, um framework extensível que instancia essa arquitetura. A arquitetura define as responsabilidades e o fluxo de dados da refatoração, enquanto o framework oferece componentes e pontos de extensão para concretizar esse fluxo. As seções seguintes apresentam esses dois elementos.
+Para operacionalizar essa abordagem, o trabalho contribui com (1) uma arquitetura em \textit{pipeline} para refatoração de código de teste; e (2) o Róża, um \textit{framework} extensível que instancia essa arquitetura. A arquitetura define as responsabilidades e o fluxo de dados da refatoração, enquanto o \textit{framework} oferece componentes e pontos de extensão para concretizar esse fluxo. As seções seguintes apresentam esses dois elementos.
 
-\section{Arquitetura em pipeline}
+\section{Arquitetura em \textit{pipeline}}
 
-A Figura~\ref{figure:pipeline-architecture} apresenta a arquitetura, que organiza o processo de refatoração em um pipeline de sete etapas: carregamento, análise sintática, decomposição, medição, agrupamento, refatoração e escrita. Cada etapa recebe os dados produzidos pela etapa anterior e gera a entrada da próxima. Essa separação permite substituir uma estratégia sem modificar as demais partes do processo. Assim, diferentes formas de obter os arquivos, linguagens, frameworks de teste, métricas de similaridade, algoritmos de agrupamento, estratégias de refatoração e destinos de escrita podem ser combinados dentro do mesmo fluxo. Embora o objetivo deste trabalho seja promover o reuso de código por meio da configuração implícita, a arquitetura não se restringe a essa estratégia. Sua flexibilidade permite incorporar outros tipos de refatoração, como a extração de código comum por meio da configuração delegada.
+A Figura~\ref{figure:pipeline-architecture} apresenta a arquitetura, que organiza o processo de refatoração em um \textit{pipeline} de sete etapas: carregamento, análise sintática, decomposição, medição, agrupamento, refatoração e escrita. Cada etapa recebe os dados produzidos pela etapa anterior e gera a entrada da próxima. Essa separação permite substituir uma estratégia sem modificar as demais partes do processo. Assim, diferentes formas de obter os arquivos, linguagens, \textit{frameworks} de teste, métricas de similaridade, algoritmos de agrupamento, estratégias de refatoração e destinos de escrita podem ser combinados dentro do mesmo fluxo. Embora o objetivo deste trabalho seja promover o reuso de código por meio da configuração implícita, a arquitetura não se restringe a essa estratégia. Sua flexibilidade permite incorporar outros tipos de refatoração, como a extração de código comum por meio da configuração delegada.
 
 \begin{figure}[htb]
 	\centering
 	\includegraphics[width=\textwidth]{figures/pipeline-architecture.png}
-	\caption{Arquitetura em pipeline para refatoração de código de teste}
+	\caption{Arquitetura em \textit{pipeline} para refatoração de código de teste}
 	\label{figure:pipeline-architecture}
 	\fonte{Elaborado pelo autor.}
 \end{figure}
@@ -37,9 +37,9 @@ Na etapa de \textbf{refatoração}, as classes de teste são reconstruídas a pa
 
 Por fim, a etapa de \textbf{escrita} persiste os arquivos de código refatorados em um destino de saída, como o sistema de arquivos. Com isso, o fluxo proposto se encerra em artefatos de código, e não apenas em um modelo em memória.
 
-\section{Framework Róża}
+\section{\textit{Framework} Róża}
 
-O Róża é um framework extensível que constitui uma instância da arquitetura em pipeline, com foco na refatoração por meio da estratégia de configuração implícita, e encontra-se em desenvolvimento. No estágio atual desta pesquisa, foi implementado o fluxo até a etapa de medição, compreendendo o carregamento, a análise sintática, a decomposição e a medição. Esse fluxo produz a matriz de similaridade necessária para a continuação do pipeline. As etapas de agrupamento, refatoração e escrita integram a arquitetura proposta, mas ainda não foram implementadas no framework. A Figura~\ref{figure:roza-class-diagram} apresenta as classes e as interfaces atualmente implementadas, organizadas em quatro pacotes que correspondem às etapas já concretizadas. Por concisão, o diagrama omite a maior parte das demais classes e apresenta apenas as principais.
+O Róża é um \textit{framework} extensível que constitui uma instância da arquitetura em \textit{pipeline}, com foco na refatoração por meio da estratégia de configuração implícita, e encontra-se em desenvolvimento. No estágio atual desta pesquisa, foi implementado o fluxo até a etapa de medição, compreendendo o carregamento, a análise sintática, a decomposição e a medição. Esse fluxo produz a matriz de similaridade necessária para a continuação do \textit{pipeline}. As etapas de agrupamento, refatoração e escrita integram a arquitetura proposta, mas ainda não foram implementadas no \textit{framework}. A Figura~\ref{figure:roza-class-diagram} apresenta as classes e as interfaces atualmente implementadas, organizadas em quatro pacotes que correspondem às etapas já concretizadas. Por concisão, o diagrama omite a maior parte das demais classes e apresenta apenas as principais.
 
 \begin{figure}[htb]
 	\centering
@@ -53,7 +53,7 @@ No carregamento, a interface \texttt{CodeFileLoader} produz \texttt{LoadedCodeFi
 
 Cada etapa é representada por um contrato de entrada e de saída, e não por uma implementação rígida. As implementações não se invocam mutuamente: um orquestrador consome o artefato produzido por uma etapa e o fornece à seguinte. Com isso, uma implementação de análise sintática pode ser combinada com diferentes implementações de medição sem que qualquer uma delas conheça a outra. Novas linguagens ou métricas de similaridade entram no fluxo pela substituição do contrato correspondente.
 
-A Figura~\ref{figure:roza-screenshot} apresenta a interface gráfica do Róża na etapa de decomposição. À esquerda, o resumo das violações registra a contagem de classes e testes afetados, os testes excluídos e os testes aceitos no pipeline. À direita, a aba \textit{Classes} permite inspecionar cada classe de teste e consultar, na aba \textit{Summary}, atributos, configurações, testes e violações associadas.
+A Figura~\ref{figure:roza-screenshot} apresenta a interface gráfica do Róża na etapa de decomposição. À esquerda, o resumo das violações registra a contagem de classes e testes afetados, os testes excluídos e os testes aceitos no \textit{pipeline}. À direita, a aba \textit{Classes} permite inspecionar cada classe de teste e consultar, na aba \textit{Summary}, atributos, configurações, testes e violações associadas.
 
 \begin{figure}[htb]
 	\centering
@@ -65,19 +65,19 @@ A Figura~\ref{figure:roza-screenshot} apresenta a interface gráfica do Róża n
 
 \subsection{Análise sintática}
 
-A implementação atual processa classes de teste escritas em Java com o framework JUnit, nas versões 4 e 5. A análise sintática dessas classes é realizada com a biblioteca JavaParser\footnote{\url{https://javaparser.org/}}, da qual resulta o modelo estrutural utilizado nas etapas seguintes.
+A implementação atual processa classes de teste escritas em Java com o \textit{framework} JUnit, nas versões 4 e 5. A análise sintática dessas classes é realizada com a biblioteca JavaParser\footnote{\url{https://javaparser.org/}}, da qual resulta o modelo estrutural utilizado nas etapas seguintes.
 
-A análise sintática não se limita a construir o modelo estrutural. O analisador também busca construções que não são tratadas pelo Róża ou cuja preservação não pode ser assegurada durante a refatoração. Quando identifica uma dessas construções, registra uma violação. Cada violação indica o escopo (a classe ou o método), o nome da classe, o nome do método quando aplicável, uma descrição e o trecho de código correspondente. O escopo determina o que é excluído das etapas seguintes. Uma violação de classe remove todos os testes daquela classe. Uma violação de método remove apenas o método afetado, de modo que os demais testes da classe possam seguir no pipeline. Com isso, as etapas seguintes recebem somente testes que pertencem ao conjunto de construções tratadas.
+A análise sintática não se limita a construir o modelo estrutural. O analisador também busca construções que não são tratadas pelo Róża ou cuja preservação não pode ser assegurada durante a refatoração. Quando identifica uma dessas construções, registra uma violação. Cada violação indica o escopo (a classe ou o método), o nome da classe, o nome do método quando aplicável, uma descrição e o trecho de código correspondente. O escopo determina o que é excluído das etapas seguintes. Uma violação de classe remove todos os testes daquela classe. Uma violação de método remove apenas o método afetado, de modo que os demais testes da classe possam seguir no \textit{pipeline}. Com isso, as etapas seguintes recebem somente testes que pertencem ao conjunto de construções tratadas.
 
 Entre outros requisitos, uma classe de teste deve ser concreta, não utilizar herança nem declarar tipos aninhados, conter métodos de teste sem parâmetros e possuir, no máximo, um método de configuração implícita (\texttt{@Before} ou \texttt{@BeforeEach}). As violações são registradas por cinco razões, que podem ocorrer simultaneamente: (1) a construção constitui uma má prática; (2) o comportamento que deveria ser preservado não está suficientemente definido para a refatoração; (3) o suporte à construção foi excluído para simplificar a implementação do Róża; (4) a transformação pode alterar a compilação ou o resultado observado dos testes; e (5) não há uma forma coerente de representar ou refatorar a construção no modelo adotado. O Apêndice~\ref{appendix:test-code-violations} descreve cada violação e indica as razões aplicáveis.
 
 \subsection{Medição}
 
-O framework oferece cinco métricas de similaridade: JPlag \cite{prechelt:etal:2002}\footnote{\url{https://jplag.de}}, Simian\footnote{\url{https://simian.quandarypeak.com/}}, Deckard \cite{jiang:etal:2007}\footnote{\url{https://github.com/skyhover/Deckard}}, a subsequência comum mais longa (\textit{Longest Common Subsequence} -- LCS) \cite{hirschberg:1977} e a subsequência comum inicial contígua mais longa (\textit{Longest Common Contiguous Start Subsequence} -- LCCSS) \cite{silva:etal:2020}. Essas métricas cobrem as abordagens baseadas em tokens, em texto e em árvores, discutidas no \autoref{chapter:background}, além de duas métricas sobre sequências de comandos. As seções seguintes apresentam cada uma dessas métricas. JPlag, Simian e Deckard são ferramentas existentes de detecção de clones. O Róża não as reimplementa: para cada uma, oferece um adaptador que invoca a ferramenta e interpreta a saída produzida, a fim de obter o grau de similaridade e registrá-lo na matriz.
+O \textit{framework} oferece cinco métricas de similaridade: JPlag \cite{prechelt:etal:2002}\footnote{\url{https://jplag.de}}, Simian\footnote{\url{https://simian.quandarypeak.com/}}, Deckard \cite{jiang:etal:2007}\footnote{\url{https://github.com/skyhover/Deckard}}, a subsequência comum mais longa (\textit{Longest Common Subsequence} -- LCS) \cite{hirschberg:1977} e a subsequência comum inicial contígua mais longa (\textit{Longest Common Contiguous Start Subsequence} -- LCCSS) \cite{silva:etal:2020}. Essas métricas cobrem as abordagens baseadas em \textit{tokens}, em texto e em árvores, discutidas no \autoref{chapter:background}, além de duas métricas sobre sequências de comandos. As seções seguintes apresentam cada uma dessas métricas. JPlag, Simian e Deckard são ferramentas existentes de detecção de clones. O Róża não as reimplementa: para cada uma, oferece um adaptador que invoca a ferramenta e interpreta a saída produzida, a fim de obter o grau de similaridade e registrá-lo na matriz.
 
 \subsubsection{JPlag}
 
-JPlag consiste em um detector de clones baseado em tokens, com suporte a linguagens como Java, C++ e Python \cite{prechelt:etal:2002}. A ferramenta admite um parâmetro de sensibilidade, correspondente ao número mínimo de tokens que devem coincidir para que um trecho seja considerado comum. No Róża, o adaptador materializa internamente a configuração de acessórios de cada teste em arquivos, invoca a ferramenta e interpreta o relatório HTML para obter o grau de similaridade de cada par. O relatório informa dois graus, um para cada sentido da comparação, o que torna a métrica assimétrica (i.e., $\delta(\alpha, \beta)$ pode diferir de $\delta(\beta, \alpha)$).
+JPlag consiste em um detector de clones baseado em \textit{tokens}, com suporte a linguagens como Java, C++ e Python \cite{prechelt:etal:2002}. A ferramenta admite um parâmetro de sensibilidade, correspondente ao número mínimo de \textit{tokens} que devem coincidir para que um trecho seja considerado comum. No Róża, o adaptador materializa internamente a configuração de acessórios de cada teste em arquivos, invoca a ferramenta e interpreta o relatório (\textit{HyperText Markup Language} -- HTML) para obter o grau de similaridade de cada par. O relatório informa dois graus, um para cada sentido da comparação, o que torna a métrica assimétrica (i.e., $\delta(\alpha, \beta)$ pode diferir de $\delta(\beta, \alpha)$).
 
 \subsubsection{Simian}
 
@@ -92,11 +92,11 @@ Na Equação~\ref{equation:simian-deckard-similarity}, $\alpha$ e $\beta$ denota
 
 \subsubsection{Deckard}
 
-Deckard consiste em um detector de clones baseado em árvores \cite{jiang:etal:2007}. Assim como Simian, a ferramenta produz um relatório de clones. O adaptador interpreta essa saída e obtém o grau de similaridade pela Equação~\ref{equation:simian-deckard-similarity}, o que também torna a métrica assimétrica. Deckard oferece três parâmetros: o número mínimo de tokens para classificar dois fragmentos como clones; o passo (\textit{stride}), que indica quantos tokens podem ser ignorados ao unir fragmentos não contíguos; e o limiar mínimo de similaridade, com valores entre 0,0 e 1,0. Como a ferramenta opera sobre arquivos, o adaptador materializa internamente a configuração de acessórios de cada teste antes de invocá-la.
+Deckard consiste em um detector de clones baseado em árvores \cite{jiang:etal:2007}. Assim como Simian, a ferramenta produz um relatório de clones. O adaptador interpreta essa saída e obtém o grau de similaridade pela Equação~\ref{equation:simian-deckard-similarity}, o que também torna a métrica assimétrica. Deckard oferece três parâmetros: o número mínimo de \textit{tokens} para classificar dois fragmentos como clones; o passo (\texttt{STRIDE}), que indica quantos \textit{tokens} podem ser ignorados ao unir fragmentos não contíguos; e o limiar mínimo de similaridade, com valores entre 0,0 e 1,0. Como a ferramenta opera sobre arquivos, o adaptador materializa internamente a configuração de acessórios de cada teste antes de invocá-la.
 
 \subsubsection{LCS}
 
-A LCS não é, em si, uma métrica de similaridade, mas uma sequência obtida a partir de outras duas, contendo os elementos comuns e preservando a ordem original \cite{hirschberg:1977}. No Róża, a LCS foi convertida em uma métrica de similaridade por meio da representação de cada teste como uma sequência de comandos da configuração de acessórios, e essa métrica foi implementada no framework. O grau de similaridade é calculado pela Equação~\ref{equation:lcs-similarity}, baseada no coeficiente de \citeonline{dice:1945}. A métrica é simétrica e não exige configuração. Diferentemente de JPlag, Simian e Deckard, a LCS consome a representação em memória e dispensa a materialização em arquivos.
+A LCS não é, em si, uma métrica de similaridade, mas uma sequência obtida a partir de outras duas, contendo os elementos comuns e preservando a ordem original \cite{hirschberg:1977}. No Róża, a LCS foi convertida em uma métrica de similaridade por meio da representação de cada teste como uma sequência de comandos da configuração de acessórios, e essa métrica foi implementada no \textit{framework}. O grau de similaridade é calculado pela Equação~\ref{equation:lcs-similarity}, baseada no coeficiente de \citeonline{dice:1945}. A métrica é simétrica e não exige configuração. Diferentemente de JPlag, Simian e Deckard, a LCS consome a representação em memória e dispensa a materialização em arquivos.
 
 \begin{equation}
 	\label{equation:lcs-similarity}
@@ -155,9 +155,9 @@ A Tabela~\ref{table:similarity-metrics} sintetiza as cinco métricas. JPlag, Sim
 		\hline
 		Métrica & Abordagem & Simetria & Representação & Parâmetros & Prefixo comum \\
 		\hline
-		JPlag & tokens & assimétrica & arquivos & sensibilidade & Não \\
+		JPlag & \textit{tokens} & assimétrica & arquivos & sensibilidade & Não \\
 		Simian & texto & assimétrica & arquivos & limiar de linhas & Não \\
-		Deckard & árvores & assimétrica & arquivos & tokens, passo e limiar & Não \\
+		Deckard & árvores & assimétrica & arquivos & \textit{tokens}, passo e limiar & Não \\
 		LCS & comandos & simétrica & memória & nenhum & Não \\
 		LCCSS & comandos & simétrica & memória & nenhum & Sim \\
 		\hline
@@ -166,4 +166,4 @@ A Tabela~\ref{table:similarity-metrics} sintetiza as cinco métricas. JPlag, Sim
 
 \subsection{Etapas ainda não implementadas}
 
-As cinco métricas produzem a matriz de similaridade que constitui a entrada da etapa de agrupamento. As etapas de agrupamento, refatoração e escrita permanecem definidas na arquitetura e ainda não foram implementadas no Róża. O agrupamento deverá converter a matriz em grupos de testes; a refatoração, reconstruir as classes com configuração implícita a partir desses grupos; e a escrita, persistir os arquivos resultantes. A avaliação da abordagem quanto à redução de duplicação e ao esforço de refatoração, enunciada entre os objetivos específicos, é tratada no \autoref{chapter:conclusion}.
+As cinco métricas produzem a matriz de similaridade que constitui a entrada da etapa de agrupamento. As etapas de agrupamento, refatoração e escrita permanecem definidas na arquitetura e ainda não foram implementadas no Róża. O agrupamento deverá converter a matriz em grupos de testes; a refatoração, reconstruir as classes com configuração implícita a partir desses grupos; e a escrita, persistir os arquivos resultantes. A avaliação da abordagem quanto à redução de duplicação e ao esforço de refatoração, enunciada entre os objetivos específicos, é tratada no \autoref{chapter:evaluation}.
