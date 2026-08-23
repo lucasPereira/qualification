@@ -1,0 +1,61 @@
+digraph LcsExample {
+    graph [
+        bgcolor="white",
+        pad="0",
+        margin="0",
+        rankdir=TB,
+        ranksep="0.39",
+        nodesep="0.39",
+        splines=false
+    ];
+    node [shape=plain, fontname="Arial"];
+    edge [style=invis];
+
+    alpha [label=<
+        <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">
+            <TR><TD COLSPAN="2" BGCOLOR="#2F5F86" ALIGN="CENTER" CELLPADDING="10"><FONT COLOR="#FFFFFF" FACE="Arial" POINT-SIZE="18"><B>Teste α</B></FONT></TD></TR>
+            <TR><TD BGCOLOR="#B5E4C8" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">pedido = Pedido()</FONT></TD><TD BGCOLOR="#B5E4C8" ALIGN="RIGHT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">A</FONT></TD></TR>
+            <TR><TD BGCOLOR="#B5E4C8" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">pedido.adicionar(livro)</FONT></TD><TD BGCOLOR="#B5E4C8" ALIGN="RIGHT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">B</FONT></TD></TR>
+            <TR><TD BGCOLOR="#E8BD4F" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">pedido.aplicarDesconto(10)</FONT></TD><TD BGCOLOR="#E8BD4F" ALIGN="RIGHT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">C</FONT></TD></TR>
+            <TR><TD BGCOLOR="#7EB8DA" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">pedido.confirmar()</FONT></TD><TD BGCOLOR="#7EB8DA" ALIGN="RIGHT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">D</FONT></TD></TR>
+            <TR><TD BGCOLOR="#E8E8E8" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">assertEquals(90, total())</FONT></TD><TD BGCOLOR="#E8E8E8" ALIGN="RIGHT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">E</FONT></TD></TR>
+        </TABLE>
+    >];
+
+    beta [label=<
+        <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">
+            <TR><TD COLSPAN="2" BGCOLOR="#2F5F86" ALIGN="CENTER" CELLPADDING="10"><FONT COLOR="#FFFFFF" FACE="Arial" POINT-SIZE="18"><B>Teste β</B></FONT></TD></TR>
+            <TR><TD BGCOLOR="#B5E4C8" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">pedido = Pedido()</FONT></TD><TD BGCOLOR="#B5E4C8" ALIGN="RIGHT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">A</FONT></TD></TR>
+            <TR><TD BGCOLOR="#B5E4C8" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">pedido.adicionar(livro)</FONT></TD><TD BGCOLOR="#B5E4C8" ALIGN="RIGHT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">B</FONT></TD></TR>
+            <TR><TD BGCOLOR="#E8BD4F" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">pedido.adicionar(caneta)</FONT></TD><TD BGCOLOR="#E8BD4F" ALIGN="RIGHT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">X</FONT></TD></TR>
+            <TR><TD BGCOLOR="#7EB8DA" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">pedido.confirmar()</FONT></TD><TD BGCOLOR="#7EB8DA" ALIGN="RIGHT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">D</FONT></TD></TR>
+            <TR><TD BGCOLOR="#E8E8E8" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">assertEquals(120, total())</FONT></TD><TD BGCOLOR="#E8E8E8" ALIGN="RIGHT" CELLPADDING="8"><FONT FACE="Courier New" POINT-SIZE="16">Y</FONT></TD></TR>
+        </TABLE>
+    >];
+
+    legend [label=<
+        <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">
+            <TR><TD BGCOLOR="#2F5F86" ALIGN="CENTER" CELLPADDING="10"><FONT COLOR="#FFFFFF" FACE="Arial" POINT-SIZE="18"><B>Legenda</B></FONT></TD></TR>
+            <TR><TD BGCOLOR="#B5E4C8" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Arial" POINT-SIZE="16">prefixo comum</FONT></TD></TR>
+            <TR><TD BGCOLOR="#E8BD4F" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Arial" POINT-SIZE="16">comandos diferentes</FONT></TD></TR>
+            <TR><TD BGCOLOR="#7EB8DA" ALIGN="LEFT" CELLPADDING="8"><FONT FACE="Arial" POINT-SIZE="16">comum após divergência</FONT></TD></TR>
+            <TR><TD HEIGHT="70"></TD></TR>
+        </TABLE>
+    >];
+
+    lcs [label=<
+        <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">
+            <TR><TD COLSPAN="4" BGCOLOR="#2F5F86" ALIGN="CENTER" CELLPADDING="10"><FONT COLOR="#FFFFFF" FACE="Arial" POINT-SIZE="18"><B>LCS(α, β)</B></FONT></TD></TR>
+            <TR>
+                <TD BGCOLOR="#B5E4C8" ALIGN="CENTER" CELLPADDING="10"><FONT FACE="Courier New" POINT-SIZE="16">A</FONT></TD>
+                <TD BGCOLOR="#B5E4C8" ALIGN="CENTER" CELLPADDING="10"><FONT FACE="Courier New" POINT-SIZE="16">B</FONT></TD>
+                <TD BGCOLOR="#7EB8DA" ALIGN="CENTER" CELLPADDING="10"><FONT FACE="Courier New" POINT-SIZE="16">D</FONT></TD>
+                <TD BGCOLOR="#E8E8E8" ALIGN="CENTER" CELLPADDING="10"><FONT FACE="Arial" POINT-SIZE="16">δ = 0,60</FONT></TD>
+            </TR>
+        </TABLE>
+    >];
+
+    { rank=same; alpha; beta; legend; }
+    alpha -> lcs;
+    beta -> lcs;
+}

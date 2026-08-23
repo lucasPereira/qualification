@@ -96,27 +96,37 @@ Deckard consiste em um detector de clones baseado em árvores \cite{jiang:etal:2
 
 \subsubsection{LCS}
 
-A LCS não é, em si, uma métrica de similaridade, mas uma sequência obtida a partir de outras duas, contendo os elementos comuns e preservando a ordem original \cite{hirschberg:1977}. No Róża, a LCS foi convertida em uma métrica de similaridade por meio da representação de cada teste como uma sequência de comandos da configuração de acessórios, e essa métrica foi implementada no framework. O grau de similaridade é calculado pela Equação~\ref{equation:lcs-similarity}. A métrica é simétrica e não exige configuração. Diferentemente de JPlag, Simian e Deckard, a LCS consome a representação em memória e dispensa a materialização em arquivos.
+A LCS não é, em si, uma métrica de similaridade, mas uma sequência obtida a partir de outras duas, contendo os elementos comuns e preservando a ordem original \cite{hirschberg:1977}. No Róża, a LCS foi convertida em uma métrica de similaridade por meio da representação de cada teste como uma sequência de comandos da configuração de acessórios, e essa métrica foi implementada no framework. O grau de similaridade é calculado pela Equação~\ref{equation:lcs-similarity}, baseada no coeficiente de \citeonline{dice:1945}. A métrica é simétrica e não exige configuração. Diferentemente de JPlag, Simian e Deckard, a LCS consome a representação em memória e dispensa a materialização em arquivos.
 
 \begin{equation}
 	\label{equation:lcs-similarity}
 	\delta(\alpha, \beta) = \frac{\left|LCS(\alpha, \beta)\right| \times 2}{\left|\alpha\right| + \left|\beta\right|}
 \end{equation}
 
-Na Equação~\ref{equation:lcs-similarity}, $|\alpha|$ e $|\beta|$ correspondem ao número de comandos da configuração de acessórios de cada teste, e $|LCS(\alpha, \beta)|$ corresponde ao número de comandos da subsequência comum mais longa. A normalização pelo tamanho das duas sequências, baseada no coeficiente de \citeonline{dice:1945}, produz um grau entre 0 e 1.
+Na Equação~\ref{equation:lcs-similarity}, $|\alpha|$ e $|\beta|$ correspondem ao número de comandos da configuração de acessórios de cada teste, e $|LCS(\alpha, \beta)|$ corresponde ao número de comandos da subsequência comum mais longa. A normalização pelo tamanho das duas sequências produz um grau entre 0 e 1.
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=\textwidth]{figures/lcs-example.png}
+	\caption{Subsequência comum mais longa entre dois testes}
+	\label{figure:lcs-example}
+	\fonte{Elaborado pelo autor.}
+\end{figure}
+
+A Figura~\ref{figure:lcs-example} ilustra a LCS por meio de dois testes sobre um pedido. As sequências de comandos são $\alpha=\langle A,B,C,D,E\rangle$ e $\beta=\langle A,B,X,D,Y\rangle$. Os comandos $A$ e $B$ criam o pedido e adicionam o primeiro item; $C$ aplica um desconto; $X$ adiciona outro item; $D$ confirma o pedido; e $E$ e $Y$ verificam os respectivos totais. A LCS contém $A$, $B$ e $D$, pois preserva a ordem original e admite o comando comum posterior à divergência. Com $|LCS(\alpha,\beta)|=3$ e $|\alpha|+|\beta|=10$, a Equação~\ref{equation:lcs-similarity} atribui grau 0,60.
 
 \subsubsection{LCCSS}
 
-A subsequência comum inicial contígua mais longa (\textit{Longest Common Contiguous Start Subsequence}, LCCSS) constitui uma das contribuições desta pesquisa \cite{silva:etal:2020}, proposta para identificar pares de testes candidatos à refatoração por meio da configuração implícita. Seu desenvolvimento partiu da constatação de que métricas gerais de similaridade de código podem favorecer trechos comuns localizados em qualquer parte dos testes, embora a configuração implícita permita extrair somente uma sequência comum situada no início de todos os métodos da classe.
+A subsequência comum inicial contígua mais longa (\textit{Longest Common Contiguous Start Subsequence}, LCCSS) constitui uma das contribuições desta pesquisa \cite{silva:etal:2020}. Foi proposta para identificar pares de testes candidatos à refatoração por meio da configuração implícita. Seu desenvolvimento partiu da constatação de que métricas gerais de similaridade de código podem favorecer trechos comuns localizados em qualquer parte dos testes, embora a configuração implícita permita extrair somente uma sequência comum situada no início de todos os métodos da classe.
 
-A LCCSS foi inspirada na LCS, mas restringe a subsequência comum a um prefixo contíguo. Se $\alpha = \langle a_1, \ldots, a_m\rangle$ e $\beta = \langle b_1, \ldots, b_n\rangle$ representam as sequências de comandos da configuração de acessórios de dois testes, então $LCCSS(\alpha,\beta)$ corresponde à maior sequência $\langle a_1, \ldots, a_k\rangle$ para a qual $a_i=b_i$ em todas as posições de $1$ a $k$. A comparação começa no primeiro comando e termina assim que ocorre a primeira divergência. Consequentemente, comandos iguais encontrados depois dessa divergência não integram a LCCSS.
+A LCCSS foi inspirada na LCS, mas restringe a subsequência comum a um prefixo contíguo. Se $\alpha = \langle a_1, \ldots, a_m\rangle$ e $\beta = \langle b_1, \ldots, b_n\rangle$ representam as sequências de comandos da configuração de acessórios de dois testes, então $LCCSS(\alpha,\beta)$ corresponde à maior sequência $\langle c_1, \ldots, c_k\rangle$ para a qual $c_i=a_i=b_i$ em todas as posições de $1$ a $k$. Dois comandos são considerados iguais quando coincidem após a normalização, que remove comentários e espaços em branco irrelevantes, sem abstrair identificadores nem literais. A comparação começa no primeiro comando e termina assim que ocorre a primeira divergência. Consequentemente, comandos iguais encontrados depois dessa divergência não integram a LCCSS.
 
 \begin{equation}
 	\label{equation:lccss-similarity}
 	\delta(\alpha, \beta) = \frac{\left|LCCSS(\alpha, \beta)\right| \times 2}{\left|\alpha\right| + \left|\beta\right|}
 \end{equation}
 
-Na Equação~\ref{equation:lccss-similarity}, $|\alpha|$ e $|\beta|$ correspondem ao número de comandos das duas configurações de acessórios, e $|LCCSS(\alpha,\beta)|$ corresponde ao comprimento do prefixo comum contíguo. O grau de similaridade é obtido pela mesma normalização da Equação~\ref{equation:lcs-similarity}. O grau é 1 quando as duas configurações são idênticas e diminui conforme aumenta a proporção de comandos que não pertence ao prefixo compartilhado. A métrica é simétrica, não exige parâmetros de configuração e opera diretamente sobre a representação dos testes em memória.
+Na Equação~\ref{equation:lccss-similarity}, $|\alpha|$ e $|\beta|$ correspondem ao número de comandos das duas configurações de acessórios, e $|LCCSS(\alpha,\beta)|$ corresponde ao comprimento do prefixo comum contíguo (i.e., ao número de comandos que podem ser movidos com segurança para o método de configuração implícita). O grau de similaridade é obtido pela mesma normalização da Equação~\ref{equation:lcs-similarity} e expressa a proporção extraível em relação ao tamanho das duas configurações: vale 1 quando as configurações são idênticas e diminui conforme o prefixo comum encurta; vale 0 somente quando não há prefixo comum (i.e., quando o primeiro comando já diverge). A métrica é simétrica, não exige parâmetros de configuração e opera diretamente sobre a representação dos testes em memória. A comparação percorre as sequências até a primeira divergência e possui complexidade linear no comprimento da menor delas, em contraste com a obtenção da LCS, que é quadrática.
 
 \begin{figure}[htb]
 	\centering
@@ -126,9 +136,11 @@ Na Equação~\ref{equation:lccss-similarity}, $|\alpha|$ e $|\beta|$ corresponde
 	\fonte{Elaborado pelo autor.}
 \end{figure}
 
-A Figura~\ref{figure:lccss-lcs-comparison} ilustra a diferença entre as duas métricas por meio de dois testes sobre um pedido. As sequências de comandos são $\alpha=\langle A,B,C,D,E\rangle$ e $\beta=\langle A,B,X,D,Y\rangle$. Os comandos $A$ e $B$ criam o pedido e adicionam o primeiro item; $C$ aplica um desconto; $X$ adiciona outro item; $D$ confirma o pedido; e $E$ e $Y$ verificam os respectivos totais. A LCS contém $A$, $B$ e $D$, pois admite o comando comum posterior à divergência, e atribui grau 0,60. A LCCSS contém somente o prefixo $\langle A,B\rangle$ e atribui grau 0,40.
+A Figura~\ref{figure:lccss-lcs-comparison} retoma os testes da Figura~\ref{figure:lcs-example} e contrapõe a extração indicada pela LCS à extração indicada pela LCCSS. A LCS contém $A$, $B$ e $D$, pois admite o comando comum posterior à divergência, e atribui grau 0,60. A LCCSS contém somente o prefixo $\langle A,B\rangle$ e atribui grau 0,40.
 
 A parte inferior da figura contrapõe os efeitos das extrações indicadas pelas duas métricas. No ramo da LCS, $A$, $B$ e $D$ são movidos para o método de configuração implícita. Com isso, a confirmação do pedido é executada antes de $C$ e $X$: o teste $\alpha$ tenta aplicar um desconto a um pedido já confirmado, enquanto o teste $\beta$ tenta adicionar um item a esse pedido, e ambos falham. No ramo da LCCSS, somente o prefixo comum contíguo $\langle A,B\rangle$ é extraído. O comando $D$ permanece nos métodos de origem, depois de $C$ e $X$, o que preserva a ordem dos comandos e permite que os dois testes passem.
+
+A restrição de prefixo aparece em um caso complementar. Se as sequências fossem $\alpha=\langle A,B,C,D\rangle$ e $\beta=\langle X,B,C,D\rangle$, a LCS conteria $B$, $C$ e $D$ e atribuiria grau 0,75, embora nenhum comando pudesse ser extraído para a configuração implícita, pois a sequência compartilhada não ocupa o início dos métodos. Nesse caso, $LCCSS(\alpha,\beta)=\langle\rangle$ e o grau é 0. A configuração implícita não se aplica a esse par; outra estratégia (e.g., testes parametrizados) seria mais adequada.
 
 \subsubsection{Comparação das métricas}
 
