@@ -49,6 +49,20 @@ class TesteBanco {
 }
 \end{violationexample}
 
+\subsection{Record aninhado}
+
+Ocorre quando a classe de teste declara um \texttt{record} em seu interior. Essa violação foi adotada pelas mesmas razões que recusam a classe aninhada e o enumerador: o modelo do Róża representa cada classe de teste por um único conjunto de atributos, métodos de configuração e métodos de teste, sem tratar declarações adicionais de tipos como unidades independentes de redistribuição. No trecho, \texttt{Par} é um tipo usado por \texttt{cria}. Mover o teste sem copiar o \texttt{record} impede a compilação; copiá-lo para todas as classes geradas pode introduzir tipos que alguns testes não utilizam. Sem analisar quais testes dependem de cada \texttt{record}, não há uma transformação definida para o subconjunto tratado. Por isso, a classe deixa de integrar as etapas seguintes, ainda que o analisador conserve o texto do tipo aninhado para inspeção e para a opção de ignorar violações.
+
+\begin{violationexample}
+class TestePar {
+    private record Par(int a, int b) {}
+    @Test void cria() {
+        Par par = new Par(1, 2);
+        assertEquals(1, par.a());
+    }
+}
+\end{violationexample}
+
 \subsection{Herança}
 
 Ocorre quando a classe de teste estende outra classe. Essa violação foi adotada para simplificar a implementação, evitar que uma configuração herdada seja omitida durante a refatoração e desencorajar o uso de herança em testes. Nesse contexto, a herança constitui uma má prática porque oculta dependências de configuração e acopla os testes à hierarquia de classes. O modelo do Róża não registra a superclasse nem associa os elementos herdados aos testes da subclasse. No trecho, \texttt{TesteBanco} herda o campo \texttt{banco} e o método \texttt{criaBanco} de \texttt{TesteBaseBanco}. Antes de executar \texttt{abre}, o JUnit executa o \texttt{@Before} herdado. O suporte seria possível, mas exigiria localizar as superclasses, percorrer toda a hierarquia e incorporar seus atributos e métodos de configuração na ordem correta. Sem esse tratamento, o teste refatorado poderia perder a configuração herdada e mudar de comportamento.
@@ -303,6 +317,18 @@ Ocorre na presença de uma classe anônima ou de uma classe local. Essa violaç�
 new Runnable() {
     public void run() { banco.abrir(); }
 };
+\end{violationexample}
+
+\subsection{Record local}
+
+Ocorre na presença de um \texttt{record} declarado no interior de um método. Essa violação foi adotada pelas mesmas razões que recusam a classe local. O \texttt{record} introduz um tipo, um construtor canônico e acessórios no escopo do método, e seu corpo pode incluir um construtor compacto ou métodos próprios. No trecho, \texttt{Par} existe apenas dentro de \texttt{cria}. Extrair comandos anteriores ou posteriores à declaração, ou movê-los para um método de configuração implícita, exigiria preservar o ponto em que o tipo passa a existir e as capturas de variáveis locais. Sem essa análise, a refatoração poderia produzir código inválido ou alterar o comportamento do teste.
+
+\begin{violationexample}
+@Test void cria() {
+    record Par(int a, int b) {}
+    Par par = new Par(1, 2);
+    assertEquals(1, par.a());
+}
 \end{violationexample}
 
 \subsection{Expressão explícita this ou super}
