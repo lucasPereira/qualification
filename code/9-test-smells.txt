@@ -11,9 +11,9 @@ class TesteSistemaBancario {
   }
 
   @Test
-  fun propriedadesDoBanco() {
+  fun nomeECriacaoDeConta() {
     assertEquals("Banco do Brasil", bb.obterNome(), "nome")
-    assertEquals(Moeda.BRL, bb.obterMoeda(), "moeda")
+    assertNotNull(bb.criarConta("Bob"), "conta")
   }
 
   @Test
