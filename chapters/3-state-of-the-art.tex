@@ -1,104 +1,27 @@
 \chapter{Estado da arte}
 \label{chapter:state-of-the-art}
 
-Para o levantamento do estado da arte e a identificação de trabalhos correlatos foi realizada uma revisão exploratória da literatura, seguida de um estudo sistemático. A revisão exploratória teve como objetivo aprofundar a base de conhecimento sobre teste de software, reuso de código e métricas de similaridade, bem como verificar a interseção entre essas áreas (e.g., trabalhos que combinam teste de software e métricas de similaridade). Já o estudo sistemático concentrou-se em trabalhos com objetivo semelhante ao deste trabalho (i.e., a refatoração do código de teste). O objetivo principal da segunda etapa foi verificar a originalidade da proposta e o seu potencial de contribuição para o estado da arte, em especial no campo de teste de software.
+Para o levantamento do estado da arte e a identificação de trabalhos correlatos foi realizada uma revisão exploratória da literatura, seguida de um estudo sistemático. A revisão exploratória teve como objetivo aprofundar a base de conhecimento sobre reuso de código de teste e sobre a interseção entre teste de software e métricas de similaridade. Já o estudo sistemático concentrou-se em trabalhos com objetivo semelhante ao deste trabalho (i.e., a refatoração automática ou semiautomática do código de teste). O objetivo principal da segunda etapa foi verificar a originalidade da proposta e o seu potencial de contribuição para o estado da arte, em especial no campo de teste de software.
 
 \section{Revisão exploratória}
 
 O tema foi explorado a partir de trabalhos considerados empiricamente mais relevantes para esta pesquisa. A seleção utilizou as bases ACM Digital Library, Springer, IEEE Xplore e ScienceDirect. Além disso, a partir dos trabalhos selecionados, as referências consideradas mais relevantes também foram consultadas. A busca concentrou-se em técnicas de reuso de código de teste e métricas de similaridade aplicadas no contexto de teste de software. Convém destacar que, além da revisão exploratória, referências previamente conhecidas foram utilizadas na elaboração da fundamentação teórica.
 
 \subsection{Reuso de código de teste}
-\label{section:test-code-reuse}
 
-A seguir são apresentados trabalhos que propõem técnicas de reuso de código de teste.
+A revisão exploratória identificou três trabalhos que propõem mecanismos de reuso de código de teste: DbUnit, Picon e Estória. Para situar essas abordagens em relação ao problema desta pesquisa, também são consideradas as estratégias de configuração implícita e de configuração delegada \cite{meszaros:2007}. A análise considera o escopo de reuso de cada técnica, a forma de identificar as oportunidades e o mecanismo empregado para centralizar o código compartilhado.
 
-\subsubsection{DbUnit}
+\citeonline{christensen:etal:2006} apresentam o DbUnit, uma extensão do \textit{framework} JUnit para reusar acessórios persistentes e coletivos em testes que envolvem tabelas de banco de dados. A aplicação da técnica exige identificar manualmente os testes que operam sobre as mesmas entidades e organizá-los em uma classe para cada tabela testada. As dependências entre essas classes devem reproduzir as dependências entre as tabelas, de modo que os testes das tabelas referenciadas por chaves estrangeiras sejam executados recursivamente antes dos testes da própria classe. Para manter o banco de dados em estado consistente, cada teste que insere um registro deve possuir um teste correspondente que o remova. O reuso restringe-se, portanto, ao código de inserção de entidades persistentes e acopla a execução dos testes à ordem das dependências do esquema relacional, o que pode violar o princípio de independência dos testes \cite{meszaros:etal:2003}.
 
-\citeonline{christensen:etal:2006} apresentam o DbUnit, uma extensão do \textit{framework} JUnit que possibilita reusar acessórios persistentes e coletivos em testes que envolvem tabelas de banco de dados. Na extensão proposta são declaradas dependências entre classes de teste, as quais devem refletir a dependência existente entre as tabelas. Assim, os testes das dependências de uma classe são executados de forma recursiva antes da execução dos testes da própria classe. O trabalho considera que deverá ser definida uma classe de teste para cada tabela testada. Também é necessário definir testes para as tabelas que forem chaves estrangeiras das tabelas testadas. Dessa forma, antes de executar um teste de inserção, executa-se um teste em que o registro correspondente à chave estrangeira é inserido. A abordagem define que, para cada teste que insere um registro, deverá existir um teste que o remova, de modo que o banco de dados seja mantido em um estado consistente. Uma desvantagem da abordagem é que o reuso restringe-se a acessórios persistentes em tabelas de banco de dados e exige que a organização das classes de teste reproduza o esquema relacional. Com isso, a execução dos testes fica acoplada à ordem das dependências entre tabelas, o que pode violar o princípio de independência dos testes \cite{meszaros:etal:2003}.
+\citeonline{longo:etal:2015} propõem o Picon, que utiliza uma notação baseada em \textit{JavaScript Object Notation} -- JSON\footnote{\url{https://www.json.org/}} para manter um repositório centralizado de acessórios, em especial objetos Java simples (\textit{Plain Old Java Objects} -- POJOs). Após identificar manualmente POJOs iguais utilizados por diferentes testes, o desenvolvedor descreve cada objeto uma única vez em um arquivo com a extensão \texttt{picon}. Um qualificador identifica o acessório, que se torna manuseável pela declaração de um atributo homônimo na classe de teste (e.g., o qualificador \texttt{programador:joao} corresponde ao atributo \texttt{programadorJoao}). Embora evite repetir o código de criação desses objetos, a abordagem exige uma linguagem específica distinta daquela em que os testes são escritos. Além disso, a injeção é dinâmica, de modo que inconsistências entre qualificadores e atributos somente são percebidas durante a execução.
 
-\subsubsection{Picon}
+\citeonline{silva:etal:2017} apresentam a Estória, que promove o reuso de sequências iniciais da configuração de acessórios entre classes de teste. O desenvolvedor identifica manualmente as sequências compartilhadas e organiza as classes em uma hierarquia de dependências, na qual as classes mais abaixo reutilizam a configuração definida nas classes superiores. A abordagem admite tanto o reuso de código quanto o reuso de execução. No primeiro caso, a cadeia de configuração é executada novamente antes de cada teste, preservando a possibilidade de execução isolada e em qualquer ordem \cite{meszaros:etal:2003}. No segundo, a cadeia é reaproveitada entre testes de um mesmo ramo da hierarquia; a anotação \texttt{@Safe} identifica aqueles que não modificam os acessórios e permite reusar a execução nos testes seguintes. Esse modo reduz o tempo de execução, mas impõe uma ordem aos testes e viola sua independência. A identificação das sequências compartilhadas, a definição da hierarquia e a marcação dos testes seguros permanecem manuais.
 
-O trabalho proposto por \citeonline{longo:etal:2015} utiliza uma notação de objetos baseada em \textit{JavaScript Object Notation} -- JSON\footnote{\url{https://www.json.org/}} para definir os acessórios. Os acessórios são descritos em arquivos com a extensão \texttt{picon}, em um local separado dos testes. O objetivo é criar um repositório centralizado de acessórios utilizáveis por qualquer teste, em especial objetos Java simples (\textit{Plain Old Java Objects} -- POJOs). Cada acessório é identificado por um qualificador e torna-se manuseável pela declaração de um atributo na classe de teste, nomeado de acordo com esse qualificador (e.g., um acessório qualificado como \texttt{programador:joao} pode ser manuseado pelo atributo \texttt{programadorJoao}). Uma limitação da abordagem é que a injeção é dinâmica: inconsistências entre qualificadores e nomes de atributos somente são percebidas durante a execução dos testes. Outra limitação é que a configuração dos acessórios deve ser descrita em uma linguagem específica, distinta da linguagem na qual o teste é escrito.
+Na configuração implícita \cite{meszaros:2007}, o reuso limita-se às sequências iniciais comuns aos testes de uma classe. O desenvolvedor identifica manualmente os testes com o mesmo prefixo de configuração, reúne-os em uma classe e desloca a sequência compartilhada para um método executado antes de cada teste. A estratégia mantém o código comum próximo aos testes, mas depende da organização das classes e não permite extrair trechos compartilhados que ocorram após uma divergência nas configurações.
 
-\subsubsection{Estória}
+Na configuração delegada \cite{meszaros:2007}, o reuso abrange trechos contíguos comuns localizados em diferentes posições do código de teste. Após identificar manualmente esses trechos, o desenvolvedor os extrai para métodos auxiliares e substitui cada ocorrência por uma chamada ao método correspondente. Como os métodos auxiliares podem ser chamados por testes de classes distintas, a estratégia não exige que todos os testes que compartilham o trecho sejam reunidos na mesma classe.
 
-A abordagem proposta por \citeonline{silva:etal:2017} busca promover o reuso de código de teste entre classes diferentes. A proposta define dependência entre classes de teste para que os testes de uma classe possam reusar os acessórios definidos em outra. Com isso, é possível criar hierarquias de classes de teste, de modo que uma classe na base de uma hierarquia tenha acesso aos acessórios das classes mais ao topo. A relação de dependência implica que a classe dependente terá acesso à configuração de acessórios da outra classe.
-
-Além do reuso de código, a proposta também possibilita o reuso da execução da configuração implícita. No reuso apenas de código, a cadeia de configuração é executada novamente antes de cada teste. A dependência vale entre classes, e não entre testes, de modo que cada teste pode ser executado isoladamente ou em qualquer ordem, e o princípio de independência é preservado \cite{meszaros:etal:2003}. Já o reuso de execução reaproveita essa cadeia entre testes de um mesmo ramo da hierarquia, o que reduz o tempo de execução. Esse modo, contudo, viola o princípio de independência, pois o \textit{framework} passa a impor a ordem dos testes: primeiro os que não alteram o estado interno do SUT e, depois, os demais. A anotação \texttt{@Safe} indica os testes que não modificam os acessórios criados na configuração e, portanto, permitem reusar a execução dessa cadeia nos testes seguintes. O \textit{framework} reusa essa execução sempre que possível. Uma desvantagem da abordagem é que a identificação das sequências iniciais compartilhadas, a definição das hierarquias de classes de teste e a marcação dos testes seguros permanecem manuais.
-
-\subsubsection{Comparação entre os trabalhos}
-
-A seguir são comparadas as técnicas de reuso de código de teste. Além das abordagens apresentadas, consideram-se também as estratégias de configuração implícita e de configuração delegada \cite{meszaros:2007}. Em especial, analisam-se quatro fatores: escopo de uso, forma de identificação de duplicação, processo de refatoração e esforço de refatoração.
-
-\paragraph{Escopo}
-
-Cada técnica de reuso é limitada a um escopo específico. Algumas aplicam-se apenas a testes que envolvem acessórios persistidos em banco de dados, enquanto outras aplicam-se apenas ao código que inicializa objetos. A compreensão do escopo determina a abrangência e a granularidade de cada técnica. Quanto mais abrangente for a técnica, maiores serão as oportunidades de reuso; quanto maior for a granularidade, maior será a quantidade de código reusável na mesma oportunidade. A Tabela~\ref{table:reuse-scope} apresenta o escopo de cada técnica.
-
-\begin{table}[htb]
-	\centering
-	\caption{Escopo de uso de técnicas de reuso}
-	\label{table:reuse-scope}
-	\small
-	\begin{tabular}{>{\raggedright\arraybackslash}p{5.2cm}p{9.5cm}}
-		\hline
-		Técnica & Escopo \\
-		\hline
-		DbUnit \cite{christensen:etal:2006} & Código para inserir entidades do banco de dados. \\
-		Picon \cite{longo:etal:2015} & Código para criação de POJOs. \\
-		Configuração implícita \cite{meszaros:2007} & Sequências iniciais do código de teste. \\
-		Configuração delegada \cite{meszaros:2007} & Trechos contíguos do código de teste. \\
-		Estória \cite{silva:etal:2017} & Sequências iniciais do código de teste. \\
-		\hline
-	\end{tabular}
-\end{table}
-
-\paragraph{Forma de identificação de duplicação}
-
-A forma de identificação de duplicação impacta diretamente o esforço necessário para reconhecer oportunidades de reuso. Essa identificação ocorre antes da refatoração e determina qual parte do código deverá ser refatorada. A duplicação pode ser identificada por análise manual das linhas de código ou por outros indícios (e.g., testes que utilizam as mesmas tabelas do banco de dados). A Tabela~\ref{table:duplication-identification} relaciona cada técnica à forma de identificação.
-
-\begin{table}[htb]
-	\centering
-	\caption{Forma de identificação de duplicação de técnicas de reuso}
-	\label{table:duplication-identification}
-	\small
-	\begin{tabular}{>{\raggedright\arraybackslash}p{5.2cm}p{9.5cm}}
-		\hline
-		Técnica & Forma de identificação de duplicação \\
-		\hline
-		DbUnit \cite{christensen:etal:2006} & Identificação manual de testes que envolvem as mesmas entidades do banco de dados. \\
-		Picon \cite{longo:etal:2015} & Identificação manual de POJOs iguais entre si. \\
-		Configuração implícita \cite{meszaros:2007} & Identificação manual de sequências iniciais do código de teste iguais entre si. \\
-		Configuração delegada \cite{meszaros:2007} & Identificação manual de trechos contíguos do código de teste iguais entre si. \\
-		Estória \cite{silva:etal:2017} & Identificação manual de sequências iniciais do código de teste iguais entre si. \\
-		\hline
-	\end{tabular}
-\end{table}
-
-\paragraph{Processo de refatoração}
-
-A Tabela~\ref{table:refactoring-process} resume o processo de refatoração de cada técnica. Quanto mais simplificado for o processo, menor será o esforço para remover um único par de configurações de acessórios duplicadas. Esse processo consiste em deslocar o código duplicado para um ponto de reuso, que pode ser uma classe de teste, um método auxiliar ou um arquivo externo.
-
-\begin{table}[htb]
-	\centering
-	\caption{Processo de refatoração de técnicas de reuso}
-	\label{table:refactoring-process}
-	\small
-	\begin{tabular}{>{\raggedright\arraybackslash}p{5.2cm}p{9.5cm}}
-		\hline
-		Técnica & Processo de refatoração \\
-		\hline
-		DbUnit \cite{christensen:etal:2006} & Definição manual dos testes de uma mesma entidade do banco de dados em uma mesma classe de teste. \\
-		Picon \cite{longo:etal:2015} & Definição manual do objeto em um arquivo externo e declaração do objeto como atributo das classes de teste que o utilizam. \\
-		Configuração implícita \cite{meszaros:2007} & Definição manual da sequência inicial do código de teste em uma classe e agrupamento dos testes com a mesma sequência inicial nessa classe. \\
-		Configuração delegada \cite{meszaros:2007} & Definição manual de um método contendo o trecho contíguo do código de teste e chamada desse método nos testes que possuem o mesmo trecho. \\
-		Estória \cite{silva:etal:2017} & Definição manual da sequência inicial do código de teste em uma classe e agrupamento dos testes com a mesma sequência inicial nessa classe. \\
-		\hline
-	\end{tabular}
-\end{table}
-
-\subsubsection{Discussão}
-
-Diferentes fatores determinam a eficiência e a eficácia de uma técnica de reuso de código de teste. Uma das principais dificuldades está em garantir que o esforço de refatoração não supere o ganho obtido com a melhoria da manutenibilidade. Esse esforço pode aumentar ou diminuir conforme a técnica utilizada e conforme as características do projeto no momento da refatoração. Isso exige cuidado constante do desenvolvedor, que deve avaliar se a técnica tem sido eficiente para evitar a duplicação sem aumentar o esforço total de desenvolvimento dos testes. Além disso, a identificação de oportunidades de reuso depende da expertise do desenvolvedor. Mesmo quando algumas técnicas facilitam essa tarefa, o sucesso na identificação de duplicações permanece limitado pela capacidade humana.
+Em conjunto, as abordagens mostram que o ponto de reuso pode ser uma classe de teste, um método auxiliar ou um arquivo externo, e que cada escolha restringe as oportunidades de extração a um tipo de duplicação. DbUnit e Picon atuam sobre domínios específicos, respectivamente entidades persistentes e POJOs; Estória e configuração implícita concentram-se em sequências iniciais; e configuração delegada alcança trechos contíguos em outras posições. Em todos os casos, porém, a identificação das oportunidades ou a organização necessária à refatoração depende da intervenção do desenvolvedor. Essa dependência limita a aplicação contínua das técnicas em suítes extensas e motiva o uso de métricas de similaridade e automação para localizar e refatorar o código compartilhado.
 
 \subsection{Teste de software e métricas de similaridade}
 
@@ -114,23 +37,25 @@ Além da redução e da priorização, \citeonline{erfani:etal:2013} aplicam det
 
 \section{Estudo sistemático}
 
-Além da revisão exploratória, foi realizado um estudo sistemático para identificar trabalhos relacionados. A finalidade foi verificar se a proposta possui originalidade e potencial de contribuição para o estado da arte. Os trabalhos-alvo foram aqueles que envolvem a refatoração automática ou semiautomática de casos de teste, considerando testes escritos em linguagens de programação, testes baseados em especificação escritos em linguagens de domínio específico (\textit{Domain-Specific Language} -- DSL) e testes escritos em linguagem natural.
+Além da revisão exploratória, foi realizado um estudo sistemático para identificar trabalhos relacionados. A finalidade foi verificar se a proposta possui originalidade e potencial de contribuição para o estado da arte. Os trabalhos-alvo foram aqueles que envolvem a refatoração automática ou semiautomática de casos de teste, considerando testes escritos em linguagens de programação, testes baseados em especificação escritos em linguagens de domínio específico (\textit{Domain-Specific Language} -- DSL) e testes escritos em linguagem natural. O estudo foi conduzido em duas rodadas: a busca inicial, realizada em junho de 2024; e uma busca complementar, realizada em agosto de 2026, restrita às publicações posteriores à primeira rodada.
 
-Para a identificação dos trabalhos foram utilizadas as bases ACM Digital Library, IEEE Xplore e Scopus. A expressão de busca foi \texttt{(testing) AND (refactoring OR reuse) AND (automatic OR tool)}, adaptada a cada base. As restrições foram: (1) pesquisar em títulos, resumos e palavras-chave; (2) apenas trabalhos da área de Ciência da Computação; (3) apenas publicações em periódicos e conferências; e (4) apenas trabalhos em língua inglesa. A consulta nas três bases foi realizada em 8 de junho de 2024. Foram encontradas 913 publicações, sendo 59 da ACM Digital Library, 66 da IEEE Xplore e 808 da Scopus.
+Nas duas rodadas foram utilizadas as bases ACM Digital Library, IEEE Xplore e Scopus. A expressão de busca foi \texttt{(testing) AND (refactoring OR reuse)} \texttt{AND (automatic OR tool)}, adaptada a cada base. As restrições foram: (1) pesquisar em títulos, resumos e palavras-chave; (2) apenas trabalhos da área de Ciência da Computação; (3) apenas publicações em periódicos e conferências; e (4) apenas trabalhos em língua inglesa. A primeira rodada encontrou 933 publicações, sendo 59 da ACM Digital Library, 66 da IEEE Xplore e 808 da Scopus. A segunda encontrou 376 publicações, sendo 108 da ACM Digital Library, 125 da IEEE Xplore e 143 da Scopus. No total, as duas buscas retornaram 1.309 publicações: 167 da ACM Digital Library, 191 da IEEE Xplore e 951 da Scopus.
 
-A seleção foi dividida em três etapas, conforme a Figura~\ref{figure:systematic-study}. Na primeira etapa, foram lidos títulos e resumos, e para cada uma das 913 publicações respondeu-se à pergunta: a publicação aborda refatoração ou reuso de casos de teste? O objetivo foi eliminar trabalhos sem relação direta com o tema, uma vez que os termos da expressão de busca podem aparecer em contextos distintos. A pergunta foi respondida com ``Sim'', ``Não'' ou ``Incerto''. As respostas ``Não'' levaram ao descarte imediato (824 publicações). As respostas ``Sim'' (36 no total) seguiram diretamente para a última etapa. As 73 publicações com resposta ``Incerto'' foram avaliadas na segunda etapa, uma repescagem pela leitura da introdução e da conclusão. Nessa etapa a mesma pergunta foi repetida, agora apenas com ``Sim'' ou ``Não''. A maior parte converteu-se em ``Não'' (69 publicações). Apenas 4 publicações receberam ``Sim'' e foram incluídas na terceira etapa.
+A seleção foi dividida em três etapas, aplicadas da mesma forma nas duas rodadas e consolidadas na Figura~\ref{figure:systematic-study}. Na primeira etapa, foram lidos títulos e resumos, e para cada publicação respondeu-se à pergunta: a publicação aborda refatoração ou reuso de casos de teste? O objetivo foi eliminar trabalhos sem relação direta com o tema, uma vez que os termos da expressão de busca podem aparecer em contextos distintos. A pergunta foi respondida com ``Sim'', ``Não'' ou ``Incerto''. Ao todo, 1.149 publicações receberam ``Não'' e foram descartadas; 56 receberam ``Sim'' e seguiram diretamente para a última etapa; e 104 receberam ``Incerto'' e foram avaliadas na segunda etapa.
 
-Ao todo, 40 trabalhos foram lidos por completo na terceira etapa (36 provenientes da primeira e 4 da segunda). Após a leitura completa, respondeu-se à pergunta: a publicação trata de uma abordagem automática ou semiautomática de refatoração ou reuso de testes de software? Doze publicações foram consideradas relevantes. Uma delas apareceu tanto na Scopus quanto na ACM Digital Library, o que resultou em 11 publicações únicas. Algumas publicações analisadas propõem a adaptação automática do código de teste após refatorações no código de aplicação \cite{qusef:etal:2023} ou a detecção automática de \textit{test smells} sem estratégia de refatoração \cite{maier:etal:2023}. Embora relevantes, esses trabalhos foram excluídos por não alinharem o objetivo ao desta pesquisa.
+Na segunda etapa, as 104 publicações incertas foram reavaliadas pela leitura da introdução e da conclusão. A mesma pergunta foi repetida, agora apenas com ``Sim'' ou ``Não''. Dessas publicações, 100 receberam ``Não'' e foram descartadas, enquanto 4 receberam ``Sim'' e seguiram para a terceira etapa. Assim, 60 publicações foram lidas por completo, 56 provenientes diretamente da primeira etapa e 4 provenientes da segunda.
+
+Na terceira etapa, respondeu-se à pergunta: a publicação trata de uma abordagem automática ou semiautomática de refatoração ou reuso de testes de software? Dezenove publicações foram consideradas relevantes e 41 foram excluídas. Os trabalhos excluídos abordam temas relacionados, mas não satisfazem o critério de inclusão por razões distintas. A abordagem de \citeonline{qusef:etal:2023} adapta testes que deixam de funcionar após refatorações no código de aplicação, mas não refatora sua estrutura nem promove o reuso de código de teste. \citeonline{maier:etal:2023} detectam \textit{test smells}, mas não apresentam uma estratégia para transformar o código identificado. Os trabalhos de \citeonline{veloso:etal:2026}, \citeonline{guerraveloso:2026} e \citeonline{soares:etal:2024} catalogam ou investigam empiricamente refatorações de teste, sem oferecer um mecanismo que as aplique de forma automática ou semiautomática. \citeonline{zhao:etal:2025} investigam a prevalência de clones de \textit{mocks} e avaliam sua remoção manual, enquanto \citeonline{zhao:2025} descreve uma pesquisa em andamento sobre a futura automatização desse processo. \citeonline{freitas:etal:2024} avaliam os efeitos de ações de teste reusáveis previamente definidas por engenheiros, mas não identificam nem extraem essas ações automaticamente. \citeonline{teixeira:etal:2025} empregam teste de mutação para verificar a preservação do comportamento após uma refatoração, sem realizar a transformação. Por fim, \citeonline{herediabravo:etal:2026} refatoram a infraestrutura de ferramentas de teste para adaptá-las a sistemas reais, e não o código ou os casos de teste. Assim, esses trabalhos foram excluídos porque apenas detectam, caracterizam, validam ou apoiam refatorações, porque dependem de transformações manuais ou porque refatoram artefatos diferentes daqueles considerados neste estudo.
 
 \begin{figure}[htb]
 	\centering
 	\includegraphics[width=\textwidth]{figures/systematic-study.png}
-	\caption{Etapas de filtragem do estudo sistemático, da busca inicial até as 11 publicações incluídas}
+	\caption{Etapas consolidadas de filtragem das duas rodadas do estudo sistemático, das buscas iniciais até as 17 publicações incluídas}
 	\label{figure:systematic-study}
 	\fonte{Elaborado pelo autor.}
 \end{figure}
 
-Os trabalhos selecionados mostram que a refatoração automática de testes está fragmentada entre objetivos e artefatos distintos. Alguns refatoram código de teste executável; outros, casos de teste em linguagem natural. Os objetivos também variam: substituição de \textit{mocks}, remoção de \textit{test smells}, melhoria de análise dinâmica ou reorganização de casos de teste. Essa diversidade confirma a relevância do tema, mas também indica que as abordagens existentes não oferecem uma arquitetura reusável para refatorar suítes completas com diferentes estratégias. Além disso, nenhuma delas trata a configuração implícita como um problema global sobre toda a suíte.
+Dos 19 registros que atenderam ao critério de inclusão, dois correspondiam a publicações recuperadas em mais de uma base de dados. Após a remoção dessas duplicatas, o estudo incluiu 17 publicações únicas. Os trabalhos selecionados mostram que a refatoração automática de testes está fragmentada entre objetivos e artefatos distintos. Alguns refatoram código de teste executável; outros, casos de teste em linguagem natural. Os objetivos também variam: substituição de \textit{mocks}, remoção de \textit{test smells}, melhoria de análise dinâmica ou reorganização de casos de teste. Essa diversidade confirma a relevância do tema, mas também indica que as abordagens existentes não oferecem uma arquitetura reusável para refatorar suítes completas com diferentes estratégias. Além disso, nenhuma delas trata a configuração implícita como um problema global sobre toda a suíte.
 
 Três publicações relevantes pertencem ao mesmo grupo de autores \cite{wang:etal:2021,wang:etal:2022,wang:etal:2023}. Esses trabalhos examinam o uso de herança para criar \textit{mocks} de componentes que dependem de outros. Os autores argumentam que a herança não é o mecanismo mais adequado, pois introduz acoplamento com o código de aplicação. A proposta substitui automaticamente \textit{mocks} baseados em herança por \textit{mocks} de bibliotecas (e.g., Mockito\footnote{\url{https://site.mockito.org/}}). Em avaliação com projetos de código aberto, a abordagem identificou 334 candidatos e refatorou 276 (83\%). O foco, portanto, é substituir o mecanismo de \textit{mock}, e não reduzir a duplicação do código de teste.
 
@@ -148,24 +73,6 @@ Três publicações relevantes pertencem ao mesmo grupo de autores \cite{wang:et
 
 Por fim, \citeonline{hauptmann:etal:2015} examinam a refatoração de casos de teste em linguagem natural com técnicas de detecção de clones. Os casos são decompostos, trechos similares são extraídos e reusados, em comportamento análogo à configuração delegada. A abordagem é especialmente útil em testes de sistema (e.g., procedimentos comuns de autenticação em testes de aceitação). O processo é semiautomático: a ferramenta refatora as descrições em linguagem natural, mas o código de teste correspondente ainda precisa ser alterado manualmente.
 
-\subsection{Atualização do estudo sistemático}
-
-A consulta nas três bases foi repetida em agosto de 2026, com a mesma expressão, as mesmas restrições e o recorte temporal das publicações posteriores a 8 de junho de 2024. Foram encontradas 376 publicações, sendo 125 da IEEE Xplore, 108 da ACM Digital Library e 143 da Scopus.
-
-A seleção repetiu as três etapas da Figura~\ref{figure:systematic-study}, agora sobre o conjunto atualizado, conforme a Figura~\ref{figure:systematic-study-update}. Na primeira etapa, 325 publicações receberam ``Não'' e foram descartadas. As respostas ``Sim'' (20 no total) seguiram diretamente para a última etapa. As 31 publicações com resposta ``Incerto'' foram avaliadas na segunda etapa, uma repescagem pela leitura da introdução e da conclusão. Nessa etapa a mesma pergunta foi repetida, agora apenas com ``Sim'' ou ``Não''. Todas converteram-se em ``Não'' (31 publicações).
-
-Ao todo, 20 trabalhos foram lidos por completo na terceira etapa. Após a leitura completa, respondeu-se novamente à pergunta: a publicação trata de uma abordagem automática ou semiautomática de refatoração ou reuso de testes de software? Sete publicações foram consideradas relevantes. Uma delas apareceu tanto na Scopus quanto na IEEE Xplore, o que resultou em 6 publicações únicas. As demais, embora tratem de refatoração ou reuso de testes, foram excluídas por não apresentarem uma abordagem automática ou semiautomática alinhada ao objetivo desta pesquisa. Entre elas estão catálogos e estudos empíricos de refatorações específicas de teste \cite{veloso:etal:2026,guerraveloso:2026,soares:etal:2024}, a investigação da prevalência de clones de \textit{mocks} com refatoração manual \cite{zhao:etal:2025,zhao:2025}, a avaliação industrial de ações de teste reusáveis definidas pelos engenheiros \cite{freitas:etal:2024}, o uso de teste de mutação como rede de segurança após a refatoração \cite{teixeira:etal:2025} e a adaptação de ferramentas de teste ao software real \cite{herediabravo:etal:2026}.
-
-\begin{figure}[htb]
-	\centering
-	\includegraphics[width=\textwidth]{figures/systematic-study-update.png}
-	\caption{Etapas de filtragem da atualização do estudo sistemático, da busca inicial até as 6 publicações incluídas}
-	\label{figure:systematic-study-update}
-	\fonte{Elaborado pelo autor.}
-\end{figure}
-
-Os trabalhos incluídos na atualização confirmam o quadro já observado em 2024: a refatoração automática de testes permanece fragmentada entre \textit{test smells} pontuais, reuso para cobertura e reorganização de funções de teste. Nenhuma das abordagens oferece uma arquitetura reusável para refatorar suítes completas com diferentes estratégias, e nenhuma trata a configuração implícita como um problema global sobre toda a suíte.
-
 \citeonline{gao:etal:2025} apresentam o UTRefactor, um \textit{framework} baseado em modelos de linguagem para refatorar automaticamente \textit{test smells} em testes unitários Java. A abordagem extrai contexto do código de teste e recorre a uma base externa com definições de \textit{test smells} e regras de refatoração descritas em uma linguagem específica de domínio. O modelo é guiado por encadeamento de raciocínio, com um mecanismo de verificação para tratar múltiplos \textit{test smells} no mesmo teste. Em 879 testes de seis projetos, o número de \textit{test smells} caiu de 2.375 para 265 (89\%). O UTRefactor superou a refatoração direta por modelo de linguagem em 61,82\% na eliminação de \textit{test smells} e também superou uma ferramenta baseada em regras. O foco, portanto, é remover \textit{test smells} no interior dos testes, e não redistribuir testes entre classes para aumentar o reuso da configuração implícita.
 
 \citeonline{narang:etal:2025} apresentam a ferramenta \textit{Untangle to Weave} -- U2W, que detecta o \textit{test smell} DAT por análise de programa, separa o método em testes focados e, em seguida, combina testes estruturalmente semelhantes em testes unitários parametrizados. Em 42.334 testes de 49 projetos, o DAT apareceu em 95,9\% dos projetos, afetando em média 8,59\% dos testes. Foram refatorados 3.638 testes; a redução média de linhas executáveis nos testes afetados foi de 36,33\%. De 19 \textit{pull requests} submetidos, 16 foram aceitos. Assim como o UTRefactor, a U2W opera sobre o interior dos métodos de teste e sobre clones locais, sem tratar a configuração implícita da suíte como um todo.
@@ -181,7 +88,7 @@ Por fim, \citeonline{almeida:etal:2026} combinam casos de teste sequenciais de f
 \subsection{Discussão}
 \label{section:systematic-study-discussion}
 
-O estudo sistemático e a sua atualização confirmam o quadro já esboçado na revisão exploratória. Há um conjunto diversificado de abordagens automáticas e semiautomáticas para refatorar ou reusar testes, porém nenhuma delas trata o problema que este trabalho formula. As técnicas encontradas operam sobre o interior de um método ou de uma classe, substituem mecanismos de \textit{mock}, removem \textit{test smells} pontuais, reorganizam descrições em linguagem natural ou reusam casos para cobertura e geração de novos testes. Mesmo quando extraem código comum para um método de configuração implícita, o recorte permanece local: o Sentinel restringe-se a uma única classe, e o Dart deixa ao desenvolvedor a decisão de aplicar a extração. Nenhuma abordagem redistribui os testes de uma suíte completa de modo a ampliar o reuso das sequências iniciais de configuração de acessórios.
+As duas rodadas do estudo sistemático confirmam o quadro já esboçado na revisão exploratória. Há um conjunto diversificado de abordagens automáticas e semiautomáticas para refatorar ou reusar testes, porém nenhuma delas trata o problema que este trabalho formula. As técnicas encontradas operam sobre o interior de um método ou de uma classe, substituem mecanismos de \textit{mock}, removem \textit{test smells} pontuais, reorganizam descrições em linguagem natural ou reusam casos para cobertura e geração de novos testes. Mesmo quando extraem código comum para um método de configuração implícita, o recorte permanece local: o Sentinel restringe-se a uma única classe, e o Dart deixa ao desenvolvedor a decisão de aplicar a extração. Nenhuma abordagem redistribui os testes de uma suíte completa de modo a ampliar o reuso das sequências iniciais de configuração de acessórios.
 
 Tampouco se identifica uma arquitetura reusável que separe as etapas de obtenção dos testes, medição de similaridade, agrupamento e refatoração, de forma que diferentes estratégias possam ser combinadas no mesmo fluxo. A similaridade, quando aparece, serve à redução de suíte, à priorização ou à recomendação de casos, e não à identificação de configurações de acessórios compartilhadas para reorganizar classes de teste.
 

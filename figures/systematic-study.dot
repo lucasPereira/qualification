@@ -32,9 +32,10 @@ digraph SystematicStudy {
   identified [
     fillcolor="#e8edf1",
     label=<
-      <B>Publicações encontradas na busca</B><BR/>
+      <B>Publicações encontradas nas duas buscas</B><BR/>
       <B>em bases de dados</B><BR/>
-      913 publicações
+      1.309 publicações<BR/>
+      2024: 933 | 2026: 376
     >
   ];
 
@@ -51,7 +52,7 @@ digraph SystematicStudy {
     label=<
       <B>Selecionadas para</B><BR/>
       <B>leitura completa</B><BR/>
-      36 publicações
+      56 publicações
     >
   ];
 
@@ -59,7 +60,7 @@ digraph SystematicStudy {
     fillcolor="#fff7df",
     label=<
       <B>Publicações incertas</B><BR/>
-      73 publicações
+      104 publicações
     >
   ];
 
@@ -69,7 +70,7 @@ digraph SystematicStudy {
     label=<
       <B>Excluídas após</B><BR/>
       <B>título e resumo</B><BR/>
-      824 publicações
+      1.149 publicações
     >
   ];
 
@@ -96,14 +97,14 @@ digraph SystematicStudy {
     label=<
       <B>Excluídas após a</B><BR/>
       <B>segunda triagem</B><BR/>
-      69 publicações
+      100 publicações
     >
   ];
 
   full_reading [
     label=<
       <B>Etapa 3: leitura completa</B><BR/>
-      40 publicações
+      60 publicações
     >
   ];
 
@@ -111,7 +112,7 @@ digraph SystematicStudy {
     fillcolor="#eef8f1",
     label=<
       <B>Publicações relevantes</B><BR/>
-      12 publicações
+      19 publicações
     >
   ];
 
@@ -121,16 +122,16 @@ digraph SystematicStudy {
     label=<
       <B>Excluídas após a</B><BR/>
       <B>leitura completa</B><BR/>
-      28 publicações
+      41 publicações
     >
   ];
 
   duplicates [
     fillcolor="#fff7df",
     label=<
-      <B>Publicação duplicada</B><BR/>
-      <B>removida</B><BR/>
-      1 publicação duplicada
+      <B>Publicações duplicadas</B><BR/>
+      <B>removidas</B><BR/>
+      2 publicações duplicadas
     >
   ];
 
@@ -140,7 +141,7 @@ digraph SystematicStudy {
     penwidth=2.2,
     label=<
       <B>Publicações incluídas</B><BR/>
-      11 publicações
+      17 publicações
     >
   ];
 
