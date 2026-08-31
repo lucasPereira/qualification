@@ -1,7 +1,7 @@
 \chapter{Fundamentação teórica}
 \label{chapter:background}
 
-Três tópicos se destacam em nível de importância para este trabalho: teste de software, métricas de similaridade e algoritmos de agrupamento. Neste capítulo são apresentados os principais conceitos envolvendo a implementação de testes automatizados, as diferentes famílias de métricas de similaridade de código e os métodos de agrupamento utilizados para formar grupos de elementos similares.
+Três tópicos se destacam em nível de importância para este trabalho: teste de software, métricas de similaridade e algoritmos de agrupamento. Neste capítulo são apresentados os principais conceitos envolvendo a implementação de testes automatizados, as diferentes famílias de métricas de similaridade de código e as diferentes categorias de algoritmos de agrupamento.
 
 \section{Teste de software}
 
@@ -43,7 +43,7 @@ Na estratégia configuração local, os acessórios são criados dentro do próp
 	\fonte{Elaborado pelo autor.}
 \end{figure}
 
-Como os acessórios são criados diretamente no método de teste, torna-se fácil compreender a relação de causa e efeito entre os acessórios e as saídas do SUT. Entretanto, a longo prazo, essa estratégia tende a aumentar a duplicação de código, uma vez que diversos testes podem utilizar acessórios idênticos ou muito similares. Além disso, essa estratégia pode dificultar a compreensão do teste nos casos em que os acessórios forem muito complexos, uma vez que a quantidade de código aumenta e se torna mais difícil compreender o papel do acessório no teste.
+Como os acessórios são criados diretamente no método de teste, torna-se fácil compreender a relação de causa e efeito entre os acessórios e as saídas do SUT. Ao mesmo tempo, essa estratégia pode dificultar a compreensão do teste nos casos em que os acessórios forem muito complexos, uma vez que a quantidade de código aumenta e se torna mais difícil compreender o papel do acessório no teste. Além disso, a longo prazo, essa estratégia tende a aumentar a duplicação de código, uma vez que diversos testes podem utilizar acessórios idênticos ou muito similares
 
 \subsubsection{Estratégia configuração implícita}
 
@@ -118,7 +118,7 @@ Em outro trabalho, a similaridade entre dois programas é determinada através d
 
 Assim como as abordagens baseadas em texto, as abordagens baseadas em \textit{tokens} também avaliam a similaridade entre dois programas através da análise textual do código-fonte. Abordagens baseadas em \textit{tokens}, no entanto, aumentam o nível de abstração convertendo o código-fonte em sequências de \textit{tokens}. A utilização de \textit{tokens} visa normalizar diferenças textuais através da definição de tipos abstratos de constructos textuais (e.g., todos os identificadores ou valores literais presentes no código podem ser representados por um mesmo \textit{token}).
 
-\citeonline{kamiya:etal:2002} utilizam a abordagem baseada em \textit{token} na ferramenta CCFinder. A ferramenta é capaz de identificar clones em diferentes linguagens, incluindo C, C++, Java e COBOL. Para cada linguagem suportada, um analisador léxico dedicado é utilizado para tokenizar o código-fonte. O método busca descobrir classes de clones (i.e., fragmentos de código que compartilham uma sequência idêntica de \textit{tokens}). O resultado é a identificação e extração de rotinas comuns, incentivando o reuso de código.
+\citeonline{kamiya:etal:2002} utilizam a abordagem baseada em \textit{tokens} na ferramenta CCFinder. A ferramenta é capaz de identificar clones em diferentes linguagens, incluindo C, C++, Java e COBOL. Para cada linguagem suportada, um analisador léxico dedicado é utilizado para tokenizar o código-fonte. O método busca descobrir classes de clones (i.e., fragmentos de código que compartilham uma sequência idêntica de \textit{tokens}). O resultado é a identificação e extração de rotinas comuns, incentivando o reuso de código.
 
 \subsubsection{Métricas baseadas em árvores}
 
